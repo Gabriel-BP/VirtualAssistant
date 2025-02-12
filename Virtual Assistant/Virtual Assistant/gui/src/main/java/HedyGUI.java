@@ -1,15 +1,16 @@
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+@SuppressWarnings("ALL")
 public class HedyGUI {
     private boolean assistantRunning = false;
     private JTextArea chatArea;
@@ -17,155 +18,151 @@ public class HedyGUI {
     private JButton sendButton;
     private HedyAssistant assistant;
     private Properties appPreferences;
+    private JComboBox<String> appearanceModeDropdown;
 
     public HedyGUI() {
-        // Cargar preferencias
         loadPreferences();
 
-        // Configurar tema según preferencias
-        String themePreference = appPreferences.getProperty("theme", "light");
-        if ("dark".equals(themePreference)) {
+        String themePreference = appPreferences.getProperty("theme", "dark");
+        if ("dark".equalsIgnoreCase(themePreference)) {
             FlatDarkLaf.setup();
         } else {
             FlatLightLaf.setup();
         }
 
-        // Crear ventana principal
         JFrame frame = new JFrame("Hedy Assistant");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Restaurar posición y tamaño de la ventana desde preferencias
         int x = Integer.parseInt(appPreferences.getProperty("windowX", "100"));
         int y = Integer.parseInt(appPreferences.getProperty("windowY", "100"));
-        int width = Integer.parseInt(appPreferences.getProperty("windowWidth", "800"));
-        int height = Integer.parseInt(appPreferences.getProperty("windowHeight", "450"));
+        int width = Integer.parseInt(appPreferences.getProperty("windowWidth", "1100"));
+        int height = Integer.parseInt(appPreferences.getProperty("windowHeight", "800"));
         frame.setBounds(x, y, width, height);
-        frame.setMinimumSize(new Dimension(800, 450)); // Relación 16:9
-        frame.setLayout(new BorderLayout());
+        frame.setMinimumSize(new Dimension(1100, 800));
 
-        // Configurar eventos para guardar posición y tamaño al cerrar
-        frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+        frame.addComponentListener(new ComponentAdapter() {
             @Override
-            public void componentMoved(java.awt.event.ComponentEvent e) {
+            public void componentMoved(ComponentEvent e) {
                 saveWindowPreferences(frame);
             }
-
             @Override
-            public void componentResized(java.awt.event.ComponentEvent e) {
+            public void componentResized(ComponentEvent e) {
                 saveWindowPreferences(frame);
             }
         });
 
-        // Configurar tamaño de fuente inicial desde preferencias
-        int fontSize = Integer.parseInt(appPreferences.getProperty("fontSize", "12"));
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        frame.setContentPane(mainPanel);
 
-        // Área de texto para mostrar interacciones
+        JPanel sidebarPanel = new JPanel(new GridLayout(12, 1, 0, 10));
+        sidebarPanel.setBackground(new Color(30, 30, 30));
+        sidebarPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel logoLabel = new JLabel(new ImageIcon("utils/visuals/elder_dark.png"));
+        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        sidebarPanel.add(logoLabel);
+
+        JLabel titleLabel = new JLabel("Hedy Lamarr", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        sidebarPanel.add(titleLabel);
+
+        JButton startAssistantButton = createStyledButton("Iniciar Asistente");
+        sidebarPanel.add(startAssistantButton);
+
+        appearanceModeDropdown = new JComboBox<>(new String[]{"Dark", "Light"});
+        appearanceModeDropdown.addActionListener(e -> {
+            String selectedTheme = (String) appearanceModeDropdown.getSelectedItem();
+            setTheme(selectedTheme, frame);
+        });
+        sidebarPanel.add(appearanceModeDropdown);
+        mainPanel.add(sidebarPanel, BorderLayout.WEST);
+
         chatArea = new JTextArea();
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
-        chatArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, fontSize)); // Usar tamaño guardado en preferencias
-        JScrollPane scrollPane = new JScrollPane(chatArea);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        chatArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        chatArea.setBackground(new Color(40, 40, 40));
+        chatArea.setForeground(Color.WHITE);
+        JScrollPane chatScrollPane = new JScrollPane(chatArea);
+        mainPanel.add(chatScrollPane, BorderLayout.CENTER);
 
-        // Panel inferior para entrada de usuario
-        JPanel inputPanel = new JPanel(new BorderLayout());
+        JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
         userInputField = new JTextField();
-        userInputField.setEnabled(false); // Deshabilitar cuando el asistente no está activo
+        userInputField.putClientProperty("JTextField.placeholderText", "Escribe tu mensaje aquí...");
+        userInputField.setEnabled(false);
         sendButton = new JButton("Enviar");
         sendButton.setEnabled(false);
-
         inputPanel.add(userInputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
-        frame.add(inputPanel, BorderLayout.SOUTH);
+        mainPanel.add(inputPanel, BorderLayout.SOUTH);
 
-        // Panel superior para botones
-        JPanel topPanel = new JPanel(new BorderLayout());
-
-        // Panel izquierdo (Iniciar/Terminar Asistente)
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton toggleAssistantButton = new JButton("Iniciar Asistente");
-        leftPanel.add(toggleAssistantButton);
-
-        // Panel derecho (Ver historial, Configurar, Tamaño de fuente)
-        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton openHistoryButton = new JButton("Ver Historial");
-        JButton configureButton = new JButton("Configurar");
-
-        // Lista desplegable para seleccionar tamaño de fuente
-        String[] fontSizes = {"10", "12", "14", "16", "18", "20", "24", "28", "32", "36"};
-        JComboBox<String> fontSizeComboBox = new JComboBox<>(fontSizes);
-        fontSizeComboBox.setSelectedItem(String.valueOf(fontSize)); // Seleccionar tamaño desde preferencias
-        fontSizeComboBox.addActionListener(e -> {
-            String selectedSize = (String) fontSizeComboBox.getSelectedItem();
-            int newFontSize = Integer.parseInt(selectedSize);
-            chatArea.setFont(chatArea.getFont().deriveFont((float) newFontSize)); // Cambiar solo el tamaño
-            appPreferences.setProperty("fontSize", selectedSize); // Guardar preferencia
-            savePreferences();
-        });
-
-        rightPanel.add(openHistoryButton);
-        rightPanel.add(configureButton);
-        rightPanel.add(new JLabel("Tamaño de Fuente:"));
-        rightPanel.add(fontSizeComboBox);
-
-        topPanel.add(leftPanel, BorderLayout.WEST);
-        topPanel.add(rightPanel, BorderLayout.EAST);
-
-        frame.add(topPanel, BorderLayout.NORTH);
-
-        // Acción del botón "Iniciar/Terminar Asistente"
-        toggleAssistantButton.addActionListener(e -> {
-            assistantRunning = !assistantRunning;
-            toggleAssistantButton.setText(assistantRunning ? "Terminar Asistente" : "Iniciar Asistente");
-
-            if (assistantRunning) {
-                if (assistant == null) {
-                    assistant = new HedyAssistant("config.json", "history.log");
-                }
-                chatArea.append("Hedy: Asistente iniciado.\n");
-                userInputField.setEnabled(true);
-                sendButton.setEnabled(true);
-            } else {
-                chatArea.append("Hedy: Asistente detenido.\n");
-                userInputField.setEnabled(false);
-                sendButton.setEnabled(false);
-            }
-        });
-
-        // Acción del botón "Enviar"
+        startAssistantButton.addActionListener(e -> toggleAssistant());
         sendButton.addActionListener(e -> sendMessage());
-        userInputField.addActionListener(e -> sendMessage()); // También enviar con Enter
-
-        // Acción del botón "Ver Historial"
-        openHistoryButton.addActionListener(e -> openHistory(frame));
-
-        // Acción del botón "Configurar"
-        configureButton.addActionListener(e -> configureSettings(frame));
-
-        // Menú para cambiar tema
-        JMenuBar menuBar = new JMenuBar();
-        JMenu themeMenu = new JMenu("Temas");
-        JMenuItem lightTheme = new JMenuItem("Claro");
-        lightTheme.addActionListener(e -> setTheme(new FlatLightLaf(), frame, "light"));
-        JMenuItem darkTheme = new JMenuItem("Oscuro");
-        darkTheme.addActionListener(e -> setTheme(new FlatDarkLaf(), frame, "dark"));
-        themeMenu.add(lightTheme);
-        themeMenu.add(darkTheme);
-        menuBar.add(themeMenu);
-        frame.setJMenuBar(menuBar);
 
         frame.setVisible(true);
     }
 
-    private void setTheme(LookAndFeel theme, JFrame frame, String themeName) {
-        try {
-            UIManager.setLookAndFeel(theme);
-            SwingUtilities.updateComponentTreeUI(frame);
-            appPreferences.setProperty("theme", themeName);
-            savePreferences();
-        } catch (UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new Color(0, 122, 255));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        return button;
+    }
+
+    private void toggleAssistant() {
+        assistantRunning = !assistantRunning;
+        userInputField.setEnabled(assistantRunning);
+        sendButton.setEnabled(assistantRunning);
+        if (assistantRunning) {
+            if (assistant == null) {
+                assistant = new HedyAssistant("config.json", "history.log");
+            }
+            appendMessage("Hedy", "Asistente iniciado.");
+        } else {
+            appendMessage("Hedy", "Asistente detenido.");
+        }
+    }
+
+    private void sendMessage() {
+        String input = userInputField.getText().trim();
+        if (!input.isEmpty()) {
+            appendMessage("Usuario", input);
+            userInputField.setText("");
+            appendMessage("Hedy", assistant.processInput(input));
+        }
+    }
+
+    private void appendMessage(String sender, String message) {
+        chatArea.append(sender + ": " + message + "\n");
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
+    }
+
+    private void setTheme(String theme, JFrame frame) {
+        if ("Dark".equalsIgnoreCase(theme)) {
+            FlatDarkLaf.setup();
+            appPreferences.setProperty("theme", "dark");
+        } else {
+            FlatLightLaf.setup();
+            appPreferences.setProperty("theme", "light");
+        }
+        SwingUtilities.updateComponentTreeUI(frame);
+        savePreferences();
+    }
+
+    private void loadPreferences() {
+        appPreferences = new Properties();
+        try (InputStream input = new FileInputStream("preferences.properties")) {
+            appPreferences.load(input);
+        } catch (IOException ex) {
+            appPreferences.setProperty("theme", "dark");
+            appPreferences.setProperty("windowX", "100");
+            appPreferences.setProperty("windowY", "100");
+            appPreferences.setProperty("windowWidth", "1100");
+            appPreferences.setProperty("windowHeight", "800");
         }
     }
 
@@ -177,55 +174,6 @@ public class HedyGUI {
         savePreferences();
     }
 
-    private void sendMessage() {
-        String input = userInputField.getText();
-        if (input.isBlank() || !assistantRunning) {
-            return;
-        }
-        chatArea.append("Usuario: " + input + "\n");
-        String response = assistant.processInput(input);
-        chatArea.append("Hedy: " + response + "\n");
-        userInputField.setText(""); // Borrar campo de entrada
-    }
-
-    private void openHistory(JFrame parent) {
-        try {
-            String history = new String(Files.readAllBytes(Paths.get("history.log")));
-            JTextArea historyArea = new JTextArea(history);
-            historyArea.setEditable(false);
-            JScrollPane historyScrollPane = new JScrollPane(historyArea);
-
-            JFrame historyFrame = new JFrame("Historial de Interacciones");
-            historyFrame.setSize(500, 400);
-            historyFrame.add(historyScrollPane);
-            historyFrame.setVisible(true);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(parent, "No se pudo abrir el archivo history.log", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void configureSettings(JFrame parent) {
-        try {
-            Desktop.getDesktop().edit(new File("config.json"));
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(parent, "No se pudo abrir el archivo config.json", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void loadPreferences() {
-        appPreferences = new Properties();
-        try (InputStream input = new FileInputStream("preferences.properties")) {
-            appPreferences.load(input);
-        } catch (IOException ex) {
-            appPreferences.setProperty("theme", "light");
-            appPreferences.setProperty("fontSize", "12");
-            appPreferences.setProperty("windowX", "100");
-            appPreferences.setProperty("windowY", "100");
-            appPreferences.setProperty("windowWidth", "800");
-            appPreferences.setProperty("windowHeight", "450");
-        }
-    }
-
     private void savePreferences() {
         try (OutputStream output = new FileOutputStream("preferences.properties")) {
             appPreferences.store(output, "Hedy Preferences");
@@ -233,7 +181,6 @@ public class HedyGUI {
             ex.printStackTrace();
         }
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(HedyGUI::new);

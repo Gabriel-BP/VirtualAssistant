@@ -1,7 +1,11 @@
 public class ChatGPTClientTest {
     public static void main(String[] args) {
+        String configFilePath = "config.json";
+
+        ConfigManager configManager = new ConfigManager(configFilePath);
+        configManager.loadConfig();
         // Asegúrate de que la clave de API esté correctamente configurada en el archivo config.json
-        String apiKey = "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"; // Sustituye esto por tu clave de API real
+        String apiKey = ConfigManager.getConfig("openai_api_key");
 
         // Crear instancia del cliente ChatGPT
         ChatGPTClient chatGPTClient = new ChatGPTClient(apiKey);

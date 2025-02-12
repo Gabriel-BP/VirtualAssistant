@@ -10,7 +10,7 @@ public class HedyAssistant {
         configManager.loadConfig();
 
         // Obtener la clave de API para ChatGPT desde ConfigManager
-        String apiKey = configManager.getConfig("apiKey");
+        String apiKey = ConfigManager.getConfig("apiKey");
 
         // Inicializar KeywordMatcher, ChatGPTClient y ResponseProcessor
         KeywordMatcher keywordMatcher = new KeywordMatcher();

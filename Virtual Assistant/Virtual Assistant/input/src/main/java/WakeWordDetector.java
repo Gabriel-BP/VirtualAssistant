@@ -86,20 +86,4 @@ public class WakeWordDetector {
         // Cambiar aquí
         return (TargetDataLine) AudioSystem.getLine(dataLineInfo);
     }
-
-
-    public static void main(String[] args) {
-        try {
-            String accessKey = "dlzyGevysC6L2FeWyrijELQhsaPejtdRdAOWH902k46Q5NDCmLgfNA==";
-            String modelPath = "porcupine_params_es.pv";
-            String[] keywordPaths = {"word.ppn"};
-            float[] sensitivities = {0.5f}; // Sensibilidad ajustable
-            int audioDeviceIndex = -1; // -1 para dispositivo por defecto
-
-            WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex);
-            detector.startListening();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

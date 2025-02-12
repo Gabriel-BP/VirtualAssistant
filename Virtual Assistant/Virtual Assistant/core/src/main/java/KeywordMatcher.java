@@ -6,7 +6,7 @@ public class KeywordMatcher {
         input = input.toLowerCase(); // Convertir a minúsculas para facilitar la comparación
 
         // Detectar frases relacionadas con la hora
-        if (input.contains("¿qué hora es") || input.contains("hora") || input.contains("son las")) {
+        if (input.contains("qué hora es") || input.contains("hora")) {
             LocalTime currentTime = LocalTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
             return "Son las " + currentTime.format(formatter);

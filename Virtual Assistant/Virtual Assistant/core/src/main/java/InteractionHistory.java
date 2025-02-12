@@ -63,7 +63,7 @@ public class InteractionHistory {
 
     public void clearHistory() {
         history.clear(); // Limpia la lista de historial en memoria
-        try (FileWriter writer = new FileWriter("history.log", false)) {
+        try (FileWriter writer = new FileWriter(historyFilePath, false)) {
             writer.write(""); // Borra el contenido del archivo
         } catch (IOException e) {
             System.out.println("Error al limpiar el archivo de historial: " + e.getMessage());

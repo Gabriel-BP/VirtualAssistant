@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class ConfigManager {
     private final String configFilePath;
-    private JsonObject config;
+    private static JsonObject config;
 
     public ConfigManager(String configFilePath) {
         this.configFilePath = configFilePath;
@@ -23,7 +23,7 @@ public class ConfigManager {
         }
     }
 
-    public String getConfig(String key) {
+    public static String getConfig(String key) {
         return config.has(key) ? config.get(key).getAsString() : "Unknown";
     }
 
@@ -39,4 +39,5 @@ public class ConfigManager {
             System.out.println("Error saving config: " + e.getMessage());
         }
     }
+
 }
