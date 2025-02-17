@@ -26,7 +26,7 @@ public class InputModule {
 
         try {
             // Configurar credenciales y cliente
-            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("credentials.json"));
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("Virtual Assistant/utils/credentials.json"));
             SpeechSettings settings = SpeechSettings.newBuilder()
                     .setCredentialsProvider(() -> credentials)
                     .build();

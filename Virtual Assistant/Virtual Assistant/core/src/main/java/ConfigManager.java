@@ -17,6 +17,7 @@ public class ConfigManager {
     public void loadConfig() {
         try (FileReader reader = new FileReader(configFilePath)) {
             config = JsonParser.parseReader(reader).getAsJsonObject();
+            System.out.println("Loaded Config: " + config.toString());
         } catch (IOException e) {
             System.out.println("Error loading config: " + e.getMessage());
             config = new JsonObject(); // Initialize as empty if file is missing or invalid
@@ -24,7 +25,7 @@ public class ConfigManager {
     }
 
     public static String getConfig(String key) {
-        return config.has(key) ? config.get(key).getAsString() : "Unknown";
+        return config.has(key) ? config.get(key).toString() : "Unknown";
     }
 
     public void updateConfig(String key, String value) {

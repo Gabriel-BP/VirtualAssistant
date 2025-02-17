@@ -1,6 +1,6 @@
 public class ChatGPTClientTest {
     public static void main(String[] args) {
-        String configFilePath = "config.json";
+        String configFilePath = "utils/config.json";
 
         ConfigManager configManager = new ConfigManager(configFilePath);
         configManager.loadConfig();

@@ -1,7 +1,7 @@
 public class HedyAssistantTest {
     public static void main(String[] args) {
-        String configFilePath = "config.json";
-        String historyFilePath = "history.log"; // Archivo para historial
+        String configFilePath = "utils/config.json";
+        String historyFilePath = "utils/history.log"; // Archivo para historial
 
         HedyAssistant hedyAssistant = new HedyAssistant(configFilePath, historyFilePath);
 

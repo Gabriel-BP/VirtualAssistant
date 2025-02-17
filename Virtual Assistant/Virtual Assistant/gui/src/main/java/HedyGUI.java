@@ -1,13 +1,11 @@
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 @SuppressWarnings("ALL")
@@ -19,10 +17,14 @@ public class HedyGUI {
     private HedyAssistant assistant;
     private Properties appPreferences;
     private JComboBox<String> appearanceModeDropdown;
+    private JLabel logoLabel;
+    String configFilePath = "Virtual Assistant/utils/config.json";
+    String historyFilePath = "Virtual Assistant/utils/history.log";
+    String visualPath = "Virtual Assistant/utils/visuals";
+
 
     public HedyGUI() {
         loadPreferences();
-
         String themePreference = appPreferences.getProperty("theme", "dark");
         if ("dark".equalsIgnoreCase(themePreference)) {
             FlatDarkLaf.setup();
@@ -45,6 +47,7 @@ public class HedyGUI {
             public void componentMoved(ComponentEvent e) {
                 saveWindowPreferences(frame);
             }
+
             @Override
             public void componentResized(ComponentEvent e) {
                 saveWindowPreferences(frame);
@@ -59,7 +62,9 @@ public class HedyGUI {
         sidebarPanel.setBackground(new Color(30, 30, 30));
         sidebarPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel logoLabel = new JLabel(new ImageIcon("utils/visuals/elder_dark.png"));
+        // Add logo
+        logoLabel = new JLabel();
+        updateLogoBasedOnTheme(themePreference);
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         sidebarPanel.add(logoLabel);
 
@@ -71,12 +76,71 @@ public class HedyGUI {
         JButton startAssistantButton = createStyledButton("Iniciar Asistente");
         sidebarPanel.add(startAssistantButton);
 
-        appearanceModeDropdown = new JComboBox<>(new String[]{"Dark", "Light"});
-        appearanceModeDropdown.addActionListener(e -> {
-            String selectedTheme = (String) appearanceModeDropdown.getSelectedItem();
-            setTheme(selectedTheme, frame);
+        // Voice Control Button
+        JButton voiceControlButton = createStyledButton("Control por Voz");
+        voiceControlButton.addActionListener(e -> {
+            try {
+                ConfigManager configManager = new ConfigManager(configFilePath);
+                configManager.loadConfig();
+
+                String accessKey = ConfigManager.getConfig("picovoice_api_key");
+                String modelPath = ConfigManager.getConfig("picovoice_model_path");
+                String[] keywordPaths = {ConfigManager.getConfig("picovoice_keyword_path")};
+                float[] sensitivities = {0.5f}; // Sensitivity adjustable
+                int audioDeviceIndex = -1; // Default device
+
+                WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex);
+                detector.startListening();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Error starting voice control: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
-        sidebarPanel.add(appearanceModeDropdown);
+        sidebarPanel.add(voiceControlButton);
+
+        // Edit Configuration Button
+        JButton editConfigButton = createStyledButton("Editar Configuración");
+        editConfigButton.addActionListener(e -> {
+            try {
+                File configFile = new File(configFilePath);
+                if (!configFile.exists()) {
+                    configFile.createNewFile(); // Create the file if it doesn't exist
+                }
+
+                // Specify the path to the editor executable
+                String editorPath = "notepad.exe"; // Replace with the path to your preferred editor
+                ProcessBuilder processBuilder = new ProcessBuilder(editorPath, configFile.getAbsolutePath());
+                processBuilder.start();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Error opening configuration file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        sidebarPanel.add(editConfigButton);
+
+        // Settings Button for Theme Selection
+        JButton settingsButton = createStyledButton("⚙️ Settings");
+        settingsButton.addActionListener(e -> {
+            JDialog settingsDialog = new JDialog(frame, "Settings", true);
+            settingsDialog.setLayout(new GridLayout(2, 1));
+
+            JLabel themeLabel = new JLabel("Select Theme:");
+            JComboBox<String> themeDropdown = new JComboBox<>(new String[]{"Dark", "Light"});
+            themeDropdown.setSelectedItem(appPreferences.getProperty("theme", "dark").equalsIgnoreCase("dark") ? "Dark" : "Light");
+            themeDropdown.addActionListener(e1 -> {
+                String selectedTheme = (String) themeDropdown.getSelectedItem();
+                setTheme(selectedTheme, frame);
+                settingsDialog.dispose();
+            });
+
+            settingsDialog.add(themeLabel);
+            settingsDialog.add(themeDropdown);
+            settingsDialog.setSize(200, 100);
+            settingsDialog.setLocationRelativeTo(frame);
+            settingsDialog.setVisible(true);
+        });
+        sidebarPanel.add(settingsButton);
+
         mainPanel.add(sidebarPanel, BorderLayout.WEST);
 
         chatArea = new JTextArea();
@@ -93,6 +157,7 @@ public class HedyGUI {
         userInputField = new JTextField();
         userInputField.putClientProperty("JTextField.placeholderText", "Escribe tu mensaje aquí...");
         userInputField.setEnabled(false);
+        userInputField.addActionListener(e -> sendMessage()); // Send message on Enter key press
         sendButton = new JButton("Enviar");
         sendButton.setEnabled(false);
         inputPanel.add(userInputField, BorderLayout.CENTER);
@@ -119,7 +184,7 @@ public class HedyGUI {
         sendButton.setEnabled(assistantRunning);
         if (assistantRunning) {
             if (assistant == null) {
-                assistant = new HedyAssistant("config.json", "history.log");
+                assistant = new HedyAssistant(configFilePath, historyFilePath);
             }
             appendMessage("Hedy", "Asistente iniciado.");
         } else {
@@ -149,13 +214,20 @@ public class HedyGUI {
             FlatLightLaf.setup();
             appPreferences.setProperty("theme", "light");
         }
+        updateLogoBasedOnTheme(theme);
         SwingUtilities.updateComponentTreeUI(frame);
         savePreferences();
     }
 
+    private void updateLogoBasedOnTheme(String theme) {
+        String logoPath = visualPath + "/elder_" + theme.toLowerCase() + ".png";
+        ImageIcon logoIcon = new ImageIcon(logoPath);
+        logoLabel.setIcon(logoIcon);
+    }
+
     private void loadPreferences() {
         appPreferences = new Properties();
-        try (InputStream input = new FileInputStream("preferences.properties")) {
+        try (InputStream input = new FileInputStream("Virtual Assistant/utils/preferences.properties")) {
             appPreferences.load(input);
         } catch (IOException ex) {
             appPreferences.setProperty("theme", "dark");
