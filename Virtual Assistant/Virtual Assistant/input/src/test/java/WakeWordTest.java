@@ -8,7 +8,7 @@ public class WakeWordTest {
             String accessKey = ConfigManager.getConfig("picovoice_api_key");
             String modelPath = ConfigManager.getConfig("picovoice_model_path");
             String[] keywordPaths = {ConfigManager.getConfig("picovoice_keywords_path")};
-
+            System.out.println("Keyword Path: " + keywordPaths[0]);
             float[] sensitivities = {0.5f}; // Sensibilidad ajustable
             int audioDeviceIndex = -1; // -1 para dispositivo por defecto
 

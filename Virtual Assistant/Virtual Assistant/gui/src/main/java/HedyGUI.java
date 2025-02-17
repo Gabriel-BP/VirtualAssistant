@@ -79,17 +79,19 @@ public class HedyGUI {
         // Voice Control Button
         JButton voiceControlButton = createStyledButton("Control por Voz");
         voiceControlButton.addActionListener(e -> {
+            String configFilePath = "Virtual Assistant/utils/config.json";
+            ConfigManager configManager = new ConfigManager(configFilePath);
+            configManager.loadConfig();
             try {
-                ConfigManager configManager = new ConfigManager(configFilePath);
-                configManager.loadConfig();
-
                 String accessKey = ConfigManager.getConfig("picovoice_api_key");
                 String modelPath = ConfigManager.getConfig("picovoice_model_path");
-                String[] keywordPaths = {ConfigManager.getConfig("picovoice_keyword_path")};
-                float[] sensitivities = {0.5f}; // Sensitivity adjustable
-                int audioDeviceIndex = -1; // Default device
+                String[] keywordPaths = {ConfigManager.getConfig("picovoice_keywords_path")};
+                System.out.println("Keyword Path: " + keywordPaths[0]);
+                float[] sensitivities = {0.5f}; // Sensibilidad ajustable
+                int audioDeviceIndex = -1; // -1 para dispositivo por defecto
 
                 WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex);
+                appendMessage("Hedy", "Control por voz iniciado. Escuchando...");
                 detector.startListening();
             } catch (Exception ex) {
                 ex.printStackTrace();

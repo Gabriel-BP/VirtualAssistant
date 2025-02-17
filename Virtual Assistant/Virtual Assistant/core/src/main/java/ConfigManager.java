@@ -1,7 +1,7 @@
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -25,7 +25,22 @@ public class ConfigManager {
     }
 
     public static String getConfig(String key) {
-        return config.has(key) ? config.get(key).toString() : "Unknown";
+        if (!config.has(key)) {
+            return "Unknown";
+        }
+        return config.get(key).getAsString();
+    }
+
+    public static String[] getConfigArray(String key) {
+        if (!config.has(key)) {
+            return new String[0]; // Return an empty array if the key doesn't exist
+        }
+        JsonArray jsonArray = config.getAsJsonArray(key);
+        String[] result = new String[jsonArray.size()];
+        for (int i = 0; i < jsonArray.size(); i++) {
+            result[i] = jsonArray.get(i).getAsString();
+        }
+        return result;
     }
 
     public void updateConfig(String key, String value) {
@@ -40,5 +55,4 @@ public class ConfigManager {
             System.out.println("Error saving config: " + e.getMessage());
         }
     }
-
 }
