@@ -249,7 +249,7 @@ public class HedyGUI {
     }
 
     private void savePreferences() {
-        try (OutputStream output = new FileOutputStream("preferences.properties")) {
+        try (OutputStream output = new FileOutputStream("Virtual Assistant/utils/preferences.properties")) {
             appPreferences.store(output, "Hedy Preferences");
         } catch (IOException ex) {
             ex.printStackTrace();
