@@ -1,0 +1,226 @@
+{
+	"0": {
+		"day": {
+			"description": "Soleado"
+		},
+		"night": {
+			"description": "Despejado"
+		}
+	},
+	"1": {
+		"day": {
+			"description": "Mayormente Soleado"
+		},
+		"night": {
+			"description": "Mayormente Despejado"
+		}
+	},
+	"2": {
+		"day": {
+			"description": "Parcialmente Nublado"
+		},
+		"night": {
+			"description": "Parcialmente Nublado"
+		}
+	},
+	"3": {
+		"day": {
+			"description": "Nublado"
+		},
+		"night": {
+			"description": "Nublado"
+		}
+	},
+	"45": {
+		"day": {
+			"description": "Niebla"
+		},
+		"night": {
+			"description": "Niebla"
+		}
+	},
+	"48": {
+		"day": {
+			"description": "Niebla Escarchada"
+		},
+		"night": {
+			"description": "Niebla Escarchada"
+		}
+	},
+	"51": {
+		"day": {
+			"description": "Llovizna Ligera"
+		},
+		"night": {
+			"description": "Llovizna Ligera"
+		}
+	},
+	"53": {
+		"day": {
+			"description": "Llovizna"
+		},
+		"night": {
+			"description": "Llovizna"
+		}
+	},
+	"55": {
+		"day": {
+			"description": "Llovizna Intensa"
+		},
+		"night": {
+			"description": "Llovizna Intensa"
+		}
+	},
+	"56": {
+		"day": {
+			"description": "Llovizna Helada Ligera"
+		},
+		"night": {
+			"description": "Llovizna Helada Ligera"
+		}
+	},
+	"57": {
+		"day": {
+			"description": "Llovizna Helada"
+		},
+		"night": {
+			"description": "Llovizna Helada"
+		}
+	},
+	"61": {
+		"day": {
+			"description": "Lluvia Ligera"
+		},
+		"night": {
+			"description": "Lluvia Ligera"
+		}
+	},
+	"63": {
+		"day": {
+			"description": "Lluvia"
+		},
+		"night": {
+			"description": "Lluvia"
+		}
+	},
+	"65": {
+		"day": {
+			"description": "Lluvia Intensa"
+		},
+		"night": {
+			"description": "Lluvia Intensa"
+		}
+	},
+	"66": {
+		"day": {
+			"description": "Lluvia Helada Ligera"
+		},
+		"night": {
+			"description": "Lluvia Helada Ligera"
+		}
+	},
+	"67": {
+		"day": {
+			"description": "Lluvia Helada"
+		},
+		"night": {
+			"description": "Lluvia Helada"
+		}
+	},
+	"71": {
+		"day": {
+			"description": "Nieve Ligera"
+		},
+		"night": {
+			"description": "Nieve Ligera"
+		}
+	},
+	"73": {
+		"day": {
+			"description": "Nieve"
+		},
+		"night": {
+			"description": "Nieve"
+		}
+	},
+	"75": {
+		"day": {
+			"description": "Nieve Intensa"
+		},
+		"night": {
+			"description": "Nieve Intensa"
+		}
+	},
+	"77": {
+		"day": {
+			"description": "Granizo"
+		},
+		"night": {
+			"description": "Granizo"
+		}
+	},
+	"80": {
+		"day": {
+			"description": "Chubascos Ligeros"
+		},
+		"night": {
+			"description": "Chubascos Ligeros"
+		}
+	},
+	"81": {
+		"day": {
+			"description": "Chubascos"
+		},
+		"night": {
+			"description": "Chubascos"
+		}
+	},
+	"82": {
+		"day": {
+			"description": "Chubascos Intensos"
+		},
+		"night": {
+			"description": "Chubascos Intensos"
+		}
+	},
+	"85": {
+		"day": {
+			"description": "Chubascos de Nieve Ligeros"
+		},
+		"night": {
+			"description": "Chubascos de Nieve Ligeros"
+		}
+	},
+	"86": {
+		"day": {
+			"description": "Chubascos de Nieve"
+		},
+		"night": {
+			"description": "Chubascos de Nieve"
+		}
+	},
+	"95": {
+		"day": {
+			"description": "Tormenta Eléctrica"
+		},
+		"night": {
+			"description": "Tormenta Eléctrica"
+		}
+	},
+	"96": {
+		"day": {
+			"description": "Tormentas Eléctricas Ligeras con Granizo"
+		},
+		"night": {
+			"description": "Tormentas Eléctricas Ligeras con Granizo"
+		}
+	},
+	"99": {
+		"day": {
+			"description": "Tormenta Eléctrica con Granizo"
+		},
+		"night": {
+			"description": "Tormenta Eléctrica con Granizo"
+		}
+	}
+}
