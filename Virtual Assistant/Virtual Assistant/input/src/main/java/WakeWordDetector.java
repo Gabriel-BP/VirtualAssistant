@@ -3,16 +3,18 @@ import ai.picovoice.porcupine.Porcupine;
 import javax.sound.sampled.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+
 
 public class WakeWordDetector {
 
+    private final GUICallback guiCallback;
     private Porcupine porcupine;
     private TargetDataLine micDataLine;
 
     public WakeWordDetector(String accessKey, String modelPath,
-                            String[] keywordPaths, float[] sensitivities, int audioDeviceIndex) throws Exception {
+                            String[] keywordPaths, float[] sensitivities, int audioDeviceIndex, GUICallback guiCallback) throws Exception {
+        this.guiCallback = guiCallback;
+
         // Inicializa Porcupine
         porcupine = new Porcupine.Builder()
                 .setAccessKey(accessKey)
@@ -31,7 +33,7 @@ public class WakeWordDetector {
     public void startListening() {
         try {
             micDataLine.start();
-            System.out.println("Listening for wake words...");
+            guiCallback.appendMessage("Hedy", "Escuchando palabra clave...");
             int frameLength = porcupine.getFrameLength();
             ByteBuffer captureBuffer = ByteBuffer.allocate(frameLength * 2);
             captureBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -43,9 +45,8 @@ public class WakeWordDetector {
                     captureBuffer.asShortBuffer().get(porcupineBuffer);
                     int result = porcupine.process(porcupineBuffer);
                     if (result >= 0) {
-                        System.out.printf("[%s] Wake word detected!\n",
-                                LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-                        // Aquí puedes iniciar la lógica del asistente virtual.
+                        guiCallback.appendMessage("Hedy", "Palabra clave detectada.");
+                        break; // O iniciar otro proceso según sea necesario
                     }
                 }
             }

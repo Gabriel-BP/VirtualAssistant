@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.Properties;
 
 @SuppressWarnings("ALL")
-public class HedyGUI {
+public class HedyGUI implements  GUICallback{
     private boolean assistantRunning = false;
     private JTextArea chatArea;
     private JTextField userInputField;
@@ -79,24 +79,30 @@ public class HedyGUI {
         // Voice Control Button
         JButton voiceControlButton = createStyledButton("Control por Voz");
         voiceControlButton.addActionListener(e -> {
-            String configFilePath = "Virtual Assistant/utils/config.json";
-            ConfigManager configManager = new ConfigManager(configFilePath);
-            configManager.loadConfig();
-            try {
-                String accessKey = ConfigManager.getConfig("picovoice_api_key");
-                String modelPath = ConfigManager.getConfig("picovoice_model_path");
-                String[] keywordPaths = {ConfigManager.getConfig("picovoice_keywords_path")};
-                System.out.println("Keyword Path: " + keywordPaths[0]);
-                float[] sensitivities = {0.5f}; // Sensibilidad ajustable
-                int audioDeviceIndex = -1; // -1 para dispositivo por defecto
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    String configFilePath = "Virtual Assistant/utils/config.json";
+                    ConfigManager configManager = new ConfigManager(configFilePath);
+                    configManager.loadConfig();
+                    try {
+                        String accessKey = ConfigManager.getConfig("picovoice_api_key");
+                        String modelPath = ConfigManager.getConfig("picovoice_model_path");
+                        String[] keywordPaths = {ConfigManager.getConfig("picovoice_keywords_path")};
+                        float[] sensitivities = {0.5f};
+                        int audioDeviceIndex = -1;
 
-                WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex);
-                appendMessage("Hedy", "Control por voz iniciado. Escuchando...");
-                detector.startListening();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Error starting voice control: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
+                        // Pasar la referencia de HedyGUI como GUICallback
+                        WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex, HedyGUI.this);
+                        appendMessage("Hedy", "Control por voz iniciado. Escuchando...");
+                        detector.startListening();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(frame, "Error starting voice control: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    return null;
+                }
+            }.execute();
         });
         sidebarPanel.add(voiceControlButton);
 
@@ -203,9 +209,15 @@ public class HedyGUI {
         }
     }
 
-    private void appendMessage(String sender, String message) {
+    @Override
+    public void appendMessage(String sender, String message) {
         chatArea.append(sender + ": " + message + "\n");
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
+    }
+    @Override
+    public void updateStatus(String status) {
+        // Puedes agregar lógica para mostrar el estado en la GUI si es necesario
+        System.out.println("Estado actualizado: " + status);
     }
 
     private void setTheme(String theme, JFrame frame) {
