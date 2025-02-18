@@ -12,10 +12,19 @@ public class OpenMeteoAPI {
     private double longitude;
     private JSONObject weatherDescriptions; // Para almacenar las descripciones
 
+    // Coordenadas predeterminadas para Las Palmas de Gran Canaria
+    private static final double DEFAULT_LATITUDE = 28.0997;
+    private static final double DEFAULT_LONGITUDE = 15.4134;
+
     public OpenMeteoAPI(double latitude, double longitude) throws IOException {
         this.latitude = latitude;
         this.longitude = longitude;
         loadWeatherDescriptions();
+    }
+
+    public OpenMeteoAPI() throws IOException {
+        // Constructor sin parámetros usa las coordenadas predeterminadas
+        this(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
     }
 
     private void loadWeatherDescriptions() throws IOException {
@@ -28,9 +37,46 @@ public class OpenMeteoAPI {
         weatherDescriptions = new JSONObject(content);
     }
 
-    public String fetchWeatherData() throws IOException {
-        String apiUrl = BASE_URL + "?latitude=" + latitude + "&longitude=" + longitude +
-                "&hourly=temperature_2m,weather_code&timezone=Europe%2FLondon";
+    public String fetchWeatherData(int requestType, String... params) throws IOException {
+        // Si no se especifica un lugar, usar las coordenadas predeterminadas
+        double requestLatitude = latitude;
+        double requestLongitude = longitude;
+
+        if (requestType == 1 && params.length >= 2) {
+            // Si es una solicitud tipo 1 ("¿Qué tiempo hace en {lugar}?"), usar las coordenadas proporcionadas
+            requestLatitude = Double.parseDouble(params[0]);
+            requestLongitude = Double.parseDouble(params[1]);
+        }
+
+        String apiUrl = "";
+        switch (requestType) {
+            case 0: // ¿Qué tiempo hace?
+                apiUrl = BASE_URL + "?latitude=" + requestLatitude + "&longitude=" + requestLongitude +
+                        "&current=temperature_2m,weather_code&timezone=Europe%2FLondon";
+                break;
+            case 1: // ¿Qué tiempo hace en {lugar}?
+                apiUrl = BASE_URL + "?latitude=" + requestLatitude + "&longitude=" + requestLongitude +
+                        "&current=temperature_2m,weather_code&timezone=Europe%2FLondon";
+                break;
+            case 2: // ¿Cuál es la {variable}?
+                if (params.length < 1) {
+                    throw new IllegalArgumentException("Faltan parámetros para la solicitud tipo 2.");
+                }
+                apiUrl = BASE_URL + "?latitude=" + requestLatitude + "&longitude=" + requestLongitude +
+                        "&current=" + params[0] + "&timezone=Europe%2FLondon";
+                break;
+            case 3: // ¿A qué hora es el atardecer hoy?
+                apiUrl = BASE_URL + "?latitude=" + requestLatitude + "&longitude=" + requestLongitude +
+                        "&daily=sunset&timezone=Europe%2FLondon";
+                break;
+            case 4: // ¿Lloverá pronto?
+                apiUrl = BASE_URL + "?latitude=" + requestLatitude + "&longitude=" + requestLongitude +
+                        "&hourly=temperature_2m,weather_code&timezone=Europe%2FLondon";
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de solicitud no válido.");
+        }
+
         URL url = new URL(apiUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -45,30 +91,45 @@ public class OpenMeteoAPI {
         }
         scanner.close();
         conn.disconnect();
-        return extractUsefulInfo(response.toString());
+
+        return processResponse(response.toString(), requestType);
     }
 
-    private String extractUsefulInfo(String jsonResponse) {
+    private String processResponse(String jsonResponse, int requestType) {
         JSONObject jsonObject = new JSONObject(jsonResponse);
-        JSONObject hourly = jsonObject.getJSONObject("hourly");
-        JSONArray times = hourly.getJSONArray("time");
-        JSONArray temperatures = hourly.getJSONArray("temperature_2m");
-        JSONArray weatherCodes = hourly.getJSONArray("weather_code");
-
         StringBuilder result = new StringBuilder();
-        result.append("Hourly Forecast:\n");
 
-        for (int i = 0; i < times.length(); i++) {
-            String time = times.getString(i);
-            double temperature = temperatures.getDouble(i);
-            int weatherCode = weatherCodes.getInt(i);
-
-            // Obtener la descripción del código meteorológico
-            String description = getWeatherDescription(weatherCode, isDayTime(time));
-
-            result.append(time).append(" - ")
-                    .append(temperature).append("°C, ")
-                    .append(description).append("\n");
+        switch (requestType) {
+            case 0: // ¿Qué tiempo hace?
+            case 1: // ¿Qué tiempo hace en {lugar}?
+                JSONObject current = jsonObject.getJSONObject("current");
+                double temperature = current.getDouble("temperature_2m");
+                int weatherCode = current.getInt("weather_code");
+                String description = getWeatherDescription(weatherCode, isDayTime(current.getString("time")));
+                result.append("Temperatura actual: ").append(temperature).append("°C, ")
+                        .append(description);
+                break;
+            case 2: // ¿Cuál es la {variable}?
+                current = jsonObject.getJSONObject("current");
+                String variable = current.keys().next(); // Obtener la clave de la variable solicitada
+                result.append("Valor actual: ").append(current.get(variable));
+                break;
+            case 3: // ¿A qué hora es el atardecer hoy?
+                JSONArray daily = jsonObject.getJSONObject("daily").getJSONArray("sunset");
+                result.append("Hora del atardecer: ").append(daily.getString(0));
+                break;
+            case 4: // ¿Lloverá pronto?
+                JSONArray hourly = jsonObject.getJSONObject("hourly").getJSONArray("weather_code");
+                boolean willRain = false;
+                for (int i = 0; i < hourly.length(); i++) {
+                    int code = hourly.getInt(i);
+                    if (code >= 51 && code <= 67) { // Códigos relacionados con lluvia
+                        willRain = true;
+                        break;
+                    }
+                }
+                result.append(willRain ? "Sí, lloverá pronto." : "No, no lloverá pronto.");
+                break;
         }
 
         return result.toString();
