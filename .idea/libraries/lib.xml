@@ -2,6 +2,7 @@
   <library name="lib">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/../../../../javafx-sdk-21.0.6/lib" />
+      <root url="jar://E:/Descargas/porcupine-java-3.0.4.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -9,13 +9,10 @@ public class HedyAssistant {
         ConfigManager configManager = new ConfigManager(configFilePath);
         configManager.loadConfig();
 
-        // Obtener la clave de API para ChatGPT desde ConfigManager
-        String apiKey = ConfigManager.getConfig("apiKey");
-
-        // Inicializar KeywordMatcher, ChatGPTClient y ResponseProcessor
+        // Inicializar KeywordMatcher y QwenAssistant
         KeywordMatcher keywordMatcher = new KeywordMatcher();
-        ChatGPTClient chatGPTClient = new ChatGPTClient(apiKey);
-        this.responseProcessor = new ResponseProcessor(keywordMatcher, chatGPTClient);
+        QwenAssistant qwenAssistant = new QwenAssistant(); // Cambio aquí: Usar QwenAssistant
+        this.responseProcessor = new ResponseProcessor(keywordMatcher, qwenAssistant);
 
         // Inicializar InteractionHistory con la ruta del archivo
         this.interactionHistory = new InteractionHistory(historyFilePath);
@@ -35,10 +32,7 @@ public class HedyAssistant {
         return interactionHistory.getAllInteractions();
     }
 
-    // Metodo para limpiar el historial
     public void clearHistory() {
-        interactionHistory.clearHistory(); // Agrega un metodo en InteractionHistory para borrar datos
+        interactionHistory.clearHistory(); // Limpia el historial
     }
-
-
 }

@@ -1,21 +1,25 @@
 public class ResponseProcessor {
     private final KeywordMatcher keywordMatcher;
-    private final ChatGPTClient chatGPTClient;
+    private final QwenAssistant qwenAssistant; // Cambio aquí: Usar QwenAssistant
 
-    public ResponseProcessor(KeywordMatcher keywordMatcher, ChatGPTClient chatGPTClient) {
+    public ResponseProcessor(KeywordMatcher keywordMatcher, QwenAssistant qwenAssistant) {
         this.keywordMatcher = keywordMatcher;
-        this.chatGPTClient = chatGPTClient;
+        this.qwenAssistant = qwenAssistant;
     }
 
     public String processResponse(String input) {
-        // Intentar primero con respuestas predefinidas
-        String predefinedResponse = keywordMatcher.matchKeyword(input);
-
-        if (predefinedResponse != null) {
-            return predefinedResponse; // Retornar respuesta predefinida si existe
+        // Verificar si hay una coincidencia con las palabras clave
+        String keywordResponse = keywordMatcher.matchKeyword(input);
+        if (keywordResponse != null && !keywordResponse.isEmpty()) {
+            return keywordResponse; // Si hay coincidencia, usar KeywordMatcher
         }
 
-        // Si no coincide con palabras clave, usar ChatGPT
-        return chatGPTClient.getResponse(input);
+        try {
+            // Si no hay coincidencia, usar QwenAssistant
+            return qwenAssistant.generateResponse(input);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Lo siento, ocurrió un error al procesar tu solicitud.";
+        }
     }
 }
