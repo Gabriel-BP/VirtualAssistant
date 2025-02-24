@@ -155,7 +155,7 @@ public class HedyGUI implements  GUICallback{
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
-        chatArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        chatArea.setFont(new Font("Monospaced", Font.PLAIN, 22));
         chatArea.setBackground(new Color(40, 40, 40));
         chatArea.setForeground(Color.WHITE);
         JScrollPane chatScrollPane = new JScrollPane(chatArea);
@@ -236,6 +236,14 @@ public class HedyGUI implements  GUICallback{
     private void updateLogoBasedOnTheme(String theme) {
         String logoPath = visualPath + "/elder_" + theme.toLowerCase() + ".png";
         ImageIcon logoIcon = new ImageIcon(logoPath);
+
+        // Ajusta el tamaño del JLabel para que se adapte a la imagen
+        if (logoIcon != null) {
+            int width = logoIcon.getIconWidth();
+            int height = logoIcon.getIconHeight();
+            logoLabel.setPreferredSize(new Dimension(width, height));
+        }
+
         logoLabel.setIcon(logoIcon);
     }
 
