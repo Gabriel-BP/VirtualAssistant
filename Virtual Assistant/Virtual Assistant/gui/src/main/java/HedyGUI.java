@@ -1,6 +1,5 @@
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -9,19 +8,19 @@ import java.io.*;
 import java.util.Properties;
 
 @SuppressWarnings("ALL")
-public class HedyGUI implements  GUICallback{
+public class HedyGUI implements GUICallback {
     private boolean assistantRunning = false;
     private JTextArea chatArea;
     private JTextField userInputField;
     private JButton sendButton;
     private HedyAssistant assistant;
     private Properties appPreferences;
-    private JComboBox<String> appearanceModeDropdown;
+    private JComboBox appearanceModeDropdown;
     private JLabel logoLabel;
+    private JButton startAssistantButton; // 1. Declarar el botón como variable de clase
     String configFilePath = "Virtual Assistant/utils/config.json";
     String historyFilePath = "Virtual Assistant/utils/history.log";
     String visualPath = "Virtual Assistant/utils/visuals";
-
 
     public HedyGUI() {
         loadPreferences();
@@ -34,14 +33,12 @@ public class HedyGUI implements  GUICallback{
 
         JFrame frame = new JFrame("Hedy Assistant");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         int x = Integer.parseInt(appPreferences.getProperty("windowX", "100"));
         int y = Integer.parseInt(appPreferences.getProperty("windowY", "100"));
         int width = Integer.parseInt(appPreferences.getProperty("windowWidth", "1100"));
         int height = Integer.parseInt(appPreferences.getProperty("windowHeight", "800"));
         frame.setBounds(x, y, width, height);
         frame.setMinimumSize(new Dimension(1100, 800));
-
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
@@ -58,23 +55,31 @@ public class HedyGUI implements  GUICallback{
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         frame.setContentPane(mainPanel);
 
-        JPanel sidebarPanel = new JPanel(new GridLayout(12, 1, 0, 10));
+        JPanel sidebarPanel = new JPanel(new BorderLayout());
         sidebarPanel.setBackground(new Color(30, 30, 30));
         sidebarPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Add logo
+        // Logo
         logoLabel = new JLabel();
         updateLogoBasedOnTheme(themePreference);
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        sidebarPanel.add(logoLabel);
+        sidebarPanel.add(logoLabel, BorderLayout.NORTH);
 
+        // Título
         JLabel titleLabel = new JLabel("Hedy Lamarr", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
-        sidebarPanel.add(titleLabel);
+        sidebarPanel.add(titleLabel, BorderLayout.CENTER);
 
-        JButton startAssistantButton = createStyledButton("Iniciar Asistente");
-        sidebarPanel.add(startAssistantButton);
+        // Panel de botones corregido
+        JPanel buttonPanel = new JPanel(); // 2. Inicialización correcta
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBackground(new Color(30, 30, 30));
+        buttonPanel.add(Box.createVerticalGlue());
+
+        // 3. Asignar el primer botón a la variable de clase
+        startAssistantButton = createStyledButton("Iniciar Asistente");
+        addButton(buttonPanel, startAssistantButton);
 
         // Voice Control Button
         JButton voiceControlButton = createStyledButton("Control por Voz");
@@ -91,7 +96,6 @@ public class HedyGUI implements  GUICallback{
                         String[] keywordPaths = {ConfigManager.getConfig("picovoice_keywords_path")};
                         float[] sensitivities = {0.5f};
                         int audioDeviceIndex = -1;
-
                         // Pasar la referencia de HedyGUI como GUICallback
                         WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex, HedyGUI.this);
                         appendMessage("Hedy", "Control por voz iniciado. Escuchando...");
@@ -104,7 +108,7 @@ public class HedyGUI implements  GUICallback{
                 }
             }.execute();
         });
-        sidebarPanel.add(voiceControlButton);
+        addButton(buttonPanel, voiceControlButton);
 
         // Edit Configuration Button
         JButton editConfigButton = createStyledButton("Editar Configuración");
@@ -114,7 +118,6 @@ public class HedyGUI implements  GUICallback{
                 if (!configFile.exists()) {
                     configFile.createNewFile(); // Create the file if it doesn't exist
                 }
-
                 // Specify the path to the editor executable
                 String editorPath = "notepad.exe"; // Replace with the path to your preferred editor
                 ProcessBuilder processBuilder = new ProcessBuilder(editorPath, configFile.getAbsolutePath());
@@ -124,14 +127,13 @@ public class HedyGUI implements  GUICallback{
                 JOptionPane.showMessageDialog(frame, "Error opening configuration file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-        sidebarPanel.add(editConfigButton);
+        addButton(buttonPanel, editConfigButton);
 
         // Settings Button for Theme Selection
         JButton settingsButton = createStyledButton("⚙️ Settings");
         settingsButton.addActionListener(e -> {
             JDialog settingsDialog = new JDialog(frame, "Settings", true);
             settingsDialog.setLayout(new GridLayout(2, 1));
-
             JLabel themeLabel = new JLabel("Select Theme:");
             JComboBox<String> themeDropdown = new JComboBox<>(new String[]{"Dark", "Light"});
             themeDropdown.setSelectedItem(appPreferences.getProperty("theme", "dark").equalsIgnoreCase("dark") ? "Dark" : "Light");
@@ -140,14 +142,16 @@ public class HedyGUI implements  GUICallback{
                 setTheme(selectedTheme, frame);
                 settingsDialog.dispose();
             });
-
             settingsDialog.add(themeLabel);
             settingsDialog.add(themeDropdown);
             settingsDialog.setSize(200, 100);
             settingsDialog.setLocationRelativeTo(frame);
             settingsDialog.setVisible(true);
         });
-        sidebarPanel.add(settingsButton);
+        addButton(buttonPanel, settingsButton);
+
+        buttonPanel.add(Box.createVerticalGlue());
+        sidebarPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         mainPanel.add(sidebarPanel, BorderLayout.WEST);
 
@@ -178,12 +182,34 @@ public class HedyGUI implements  GUICallback{
         frame.setVisible(true);
     }
 
+    // 5. Modificar metodo addButton para aceptar JButton
+    private void addButton(JPanel panel, JButton button) {
+        panel.add(button);
+        panel.add(Box.createVerticalStrut(15));
+    }
+
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
+        button.putClientProperty("JButton.arc", 15);
         button.setBackground(new Color(0, 122, 255));
         button.setForeground(Color.WHITE);
         button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(180, 45));
         return button;
+    }
+
+    private void addCenteredButton(JPanel panel, JButton button, int gridy) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = gridy;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.1; // Adjust weight as needed
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(10, 0, 10, 0);
+        panel.add(button, gbc);
     }
 
     private void toggleAssistant() {
@@ -203,9 +229,24 @@ public class HedyGUI implements  GUICallback{
     private void sendMessage() {
         String input = userInputField.getText().trim();
         if (!input.isEmpty()) {
+            // Append the user's message immediately
             appendMessage("Usuario", input);
+
+            // Clear the input field after sending the message
             userInputField.setText("");
-            appendMessage("Hedy", assistant.processInput(input));
+
+            // Process the input with the assistant and handle the response asynchronously
+            new Thread(() -> {
+                try {
+                    String response = assistant.processInput(input);
+                    // Append the assistant's response once it's ready
+                    SwingUtilities.invokeLater(() -> appendMessage("Hedy", response));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // If an error occurs, append an error message
+                    SwingUtilities.invokeLater(() -> appendMessage("Hedy", "Lo siento, ha ocurrido un error al procesar tu solicitud."));
+                }
+            }).start();
         }
     }
 
@@ -214,9 +255,9 @@ public class HedyGUI implements  GUICallback{
         chatArea.append(sender + ": " + message + "\n");
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
     }
+
     @Override
     public void updateStatus(String status) {
-        // Puedes agregar lógica para mostrar el estado en la GUI si es necesario
         System.out.println("Estado actualizado: " + status);
     }
 
@@ -237,7 +278,6 @@ public class HedyGUI implements  GUICallback{
         String logoPath = visualPath + "/elder_" + theme.toLowerCase() + ".png";
         ImageIcon logoIcon = new ImageIcon(logoPath);
 
-        // Ajusta el tamaño del JLabel para que se adapte a la imagen
         if (logoIcon != null) {
             int width = logoIcon.getIconWidth();
             int height = logoIcon.getIconHeight();
