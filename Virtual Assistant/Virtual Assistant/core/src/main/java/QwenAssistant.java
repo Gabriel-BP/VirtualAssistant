@@ -13,6 +13,9 @@ public class QwenAssistant {
 
     private static final String OLLAMA_API_URL = "http://localhost:11434/api/generate";
     private static final String MODEL_NAME = "qwen2.5:7b";
+    private static final String PERMANENT_PROMPT =
+           "Eres un asistente virtual llamado Hedy que fue desarrollada por el Museo Elder de la Ciencia y la Tecnología. Intentas mantener las respuestas lo más breve que puedas, pero sin perder tu naturalidad. ";
+
 
     /**
      * Envía un prompt al modelo DeepSeek-R1 y devuelve la respuesta generada.
@@ -22,6 +25,8 @@ public class QwenAssistant {
      * @throws Exception Si ocurre algún error durante la comunicación con la API.
      */
     public String generateResponse(String prompt) throws Exception {
+        String fullPrompt = PERMANENT_PROMPT + prompt;
+
         URL url = new URL(OLLAMA_API_URL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
@@ -29,7 +34,7 @@ public class QwenAssistant {
         connection.setDoOutput(true);
 
         // Construir el cuerpo de la solicitud JSON
-        String jsonInputString = String.format("{\"model\": \"%s\", \"prompt\": \"%s\"}", MODEL_NAME, prompt);
+        String jsonInputString = String.format("{\"model\": \"%s\", \"prompt\": \"%s\"}", MODEL_NAME, fullPrompt);
 
         try (OutputStream os = connection.getOutputStream()) {
             byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
