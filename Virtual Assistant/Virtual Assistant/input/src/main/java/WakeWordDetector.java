@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
+@SuppressWarnings("ALL")
 public class WakeWordDetector {
 
     private final GUICallback guiCallback;
@@ -15,7 +16,7 @@ public class WakeWordDetector {
                             String[] keywordPaths, float[] sensitivities, int audioDeviceIndex, GUICallback guiCallback) throws Exception {
         this.guiCallback = guiCallback;
 
-        // Inicializa Porcupine
+        // Initialize Porcupine
         porcupine = new Porcupine.Builder()
                 .setAccessKey(accessKey)
                 .setModelPath(modelPath)
@@ -23,7 +24,7 @@ public class WakeWordDetector {
                 .setSensitivities(sensitivities)
                 .build();
 
-        // Configura el micrófono
+        // Configure microphone
         AudioFormat format = new AudioFormat(16000f, 16, 1, true, false);
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
         micDataLine = getAudioDevice(audioDeviceIndex, dataLineInfo);
@@ -33,7 +34,7 @@ public class WakeWordDetector {
     public void startListening() {
         try {
             micDataLine.start();
-            guiCallback.appendMessage("Hedy", "Escuchando palabra clave...");
+            guiCallback.appendMessage("Hedy", "Escuchando...");
             int frameLength = porcupine.getFrameLength();
             ByteBuffer captureBuffer = ByteBuffer.allocate(frameLength * 2);
             captureBuffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -45,12 +46,13 @@ public class WakeWordDetector {
                     captureBuffer.asShortBuffer().get(porcupineBuffer);
                     int result = porcupine.process(porcupineBuffer);
                     if (result >= 0) {
-                        guiCallback.appendMessage("Hedy", "Palabra clave detectada.");
-                        break; // O iniciar otro proceso según sea necesario
+                        guiCallback.appendMessage("Hedy", "Palabra clave detectada!");
+                        break; // Notify GUI or start transcription
                     }
                 }
             }
         } catch (Exception e) {
+            guiCallback.appendMessage("Hedy", "Error during wake word detection: " + e.getMessage());
             e.printStackTrace();
         } finally {
             releaseResources();
@@ -72,8 +74,7 @@ public class WakeWordDetector {
         }
     }
 
-    private TargetDataLine getAudioDevice(int deviceIndex, DataLine.Info dataLineInfo)
-            throws LineUnavailableException {
+    private TargetDataLine getAudioDevice(int deviceIndex, DataLine.Info dataLineInfo) throws LineUnavailableException {
         if (deviceIndex >= 0) {
             Mixer.Info[] mixers = AudioSystem.getMixerInfo();
             if (deviceIndex < mixers.length) {
@@ -84,7 +85,6 @@ public class WakeWordDetector {
             }
             System.err.printf("Invalid audio device index: %d. Using default device.\n", deviceIndex);
         }
-        // Cambiar aquí
         return (TargetDataLine) AudioSystem.getLine(dataLineInfo);
     }
 }

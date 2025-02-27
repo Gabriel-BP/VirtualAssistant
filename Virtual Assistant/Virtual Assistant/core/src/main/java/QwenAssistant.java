@@ -4,37 +4,38 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+@SuppressWarnings("ALL")
 public class QwenAssistant {
-
     private static final String OLLAMA_API_URL = "http://localhost:11434/api/generate";
     private static final String MODEL_NAME = "qwen2.5:7b";
-    private static final String PERMANENT_PROMPT =
-           "Eres un asistente virtual llamado Hedy que fue desarrollada por el Museo Elder de la Ciencia y la Tecnología. Intentas mantener las respuestas lo más breve que puedas, pero sin perder tu naturalidad. ";
-
+    private static final String SYSTEM_PROMPT =
+            "Eres un asistente virtual llamado Hedy que fue desarrollada por el Museo Elder de la Ciencia y la Tecnología. Intentas mantener las respuestas lo más breve que puedas, pero sin perder tu naturalidad.";
 
     /**
-     * Envía un prompt al modelo DeepSeek-R1 y devuelve la respuesta generada.
+     * Envía un prompt al modelo Qwen 2.5 y devuelve la respuesta generada.
      *
      * @param prompt El texto del prompt que se enviará al modelo.
      * @return La respuesta completa generada por el modelo.
      * @throws Exception Si ocurre algún error durante la comunicación con la API.
      */
     public String generateResponse(String prompt) throws Exception {
-        String fullPrompt = PERMANENT_PROMPT + prompt;
-
         URL url = new URL(OLLAMA_API_URL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
 
-        // Construir el cuerpo de la solicitud JSON
-        String jsonInputString = String.format("{\"model\": \"%s\", \"prompt\": \"%s\"}", MODEL_NAME, fullPrompt);
+        // Construir el cuerpo de la solicitud JSON con el campo "system"
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("model", MODEL_NAME);
+        jsonBody.put("prompt", prompt); // Solo el prompt dinámico
+        jsonBody.put("system", SYSTEM_PROMPT); // El sistema prompt va aquí
+
+        String jsonInputString = jsonBody.toJSONString();
 
         try (OutputStream os = connection.getOutputStream()) {
             byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
@@ -61,9 +62,18 @@ public class QwenAssistant {
                 }
             }
         }
-
         connection.disconnect();
-
         return responseBuilder.toString().trim();
+    }
+
+    public static void main(String[] args) {
+        QwenAssistant assistant = new QwenAssistant();
+        try {
+            String userPrompt = "¿Cuál es tu nombre?";
+            String response = assistant.generateResponse(userPrompt);
+            System.out.println("Respuesta del modelo: " + response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -9,6 +9,7 @@ import javax.sound.sampled.*;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
+@SuppressWarnings("ALL")
 public class InputModule {
 
     public static void main(String[] args) {
