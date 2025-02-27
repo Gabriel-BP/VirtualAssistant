@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.Properties;
 
+
 @SuppressWarnings("ALL")
 public class HedyGUI implements GUICallback {
     private boolean assistantRunning = false;
@@ -14,6 +15,7 @@ public class HedyGUI implements GUICallback {
     private JTextField userInputField;
     private JButton sendButton;
     private HedyAssistant assistant;
+    private InteractionHistory interactionHistory;
     private Properties appPreferences;
     private JComboBox appearanceModeDropdown;
     private JLabel logoLabel;
@@ -30,6 +32,7 @@ public class HedyGUI implements GUICallback {
         } else {
             FlatLightLaf.setup();
         }
+        interactionHistory = new InteractionHistory(historyFilePath);
 
         JFrame frame = new JFrame("Hedy Assistant");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -216,9 +219,11 @@ public class HedyGUI implements GUICallback {
         assistantRunning = !assistantRunning;
         userInputField.setEnabled(assistantRunning);
         sendButton.setEnabled(assistantRunning);
+
         if (assistantRunning) {
             if (assistant == null) {
                 assistant = new HedyAssistant(configFilePath, historyFilePath);
+                assistant.clearHistory(); // Clear the history when starting a new session
             }
             appendMessage("Hedy", "Asistente iniciado.");
         } else {
@@ -229,21 +234,16 @@ public class HedyGUI implements GUICallback {
     private void sendMessage() {
         String input = userInputField.getText().trim();
         if (!input.isEmpty()) {
-            // Append the user's message immediately
             appendMessage("Usuario", input);
-
-            // Clear the input field after sending the message
             userInputField.setText("");
 
-            // Process the input with the assistant and handle the response asynchronously
             new Thread(() -> {
                 try {
                     String response = assistant.processInput(input);
-                    // Append the assistant's response once it's ready
                     SwingUtilities.invokeLater(() -> appendMessage("Hedy", response));
+                    interactionHistory.addInteraction(input, response); // Add interaction to history
                 } catch (Exception e) {
                     e.printStackTrace();
-                    // If an error occurs, append an error message
                     SwingUtilities.invokeLater(() -> appendMessage("Hedy", "Lo siento, ha ocurrido un error al procesar tu solicitud."));
                 }
             }).start();

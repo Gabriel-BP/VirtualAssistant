@@ -11,9 +11,9 @@ import org.json.simple.parser.ParseException;
 @SuppressWarnings("ALL")
 public class QwenAssistant {
     private static final String OLLAMA_API_URL = "http://localhost:11434/api/generate";
-    private static final String MODEL_NAME = "qwen2.5:7b";
+    private static final String MODEL_NAME = "qwen2.5:14b";
     private static final String SYSTEM_PROMPT =
-            "Eres un asistente virtual llamado Hedy que fue desarrollada por el Museo Elder de la Ciencia y la Tecnología. Intentas mantener las respuestas lo más breve que puedas, pero sin perder tu naturalidad.";
+            "Eres un asistente virtual llamado Hedy que fue desarrollada por el Museo Elder de la Ciencia y la Tecnología. Intentas mantener las respuestas lo más breve que puedas, pero sin perder tu naturalidad. Además, tienes acceso a un historial que solo usaras si se requiere.";
 
     /**
      * Envía un prompt al modelo Qwen 2.5 y devuelve la respuesta generada.
@@ -22,12 +22,13 @@ public class QwenAssistant {
      * @return La respuesta completa generada por el modelo.
      * @throws Exception Si ocurre algún error durante la comunicación con la API.
      */
-    public String generateResponse(String prompt) throws Exception {
+    public String generateResponse(String prompt, String history) throws Exception {
         URL url = new URL(OLLAMA_API_URL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
+        prompt = "Responde basandote en este input: " + prompt + " [Historial: " + history + "]";
 
         // Construir el cuerpo de la solicitud JSON con el campo "system"
         JSONObject jsonBody = new JSONObject();
@@ -64,16 +65,5 @@ public class QwenAssistant {
         }
         connection.disconnect();
         return responseBuilder.toString().trim();
-    }
-
-    public static void main(String[] args) {
-        QwenAssistant assistant = new QwenAssistant();
-        try {
-            String userPrompt = "¿Cuál es tu nombre?";
-            String response = assistant.generateResponse(userPrompt);
-            System.out.println("Respuesta del modelo: " + response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

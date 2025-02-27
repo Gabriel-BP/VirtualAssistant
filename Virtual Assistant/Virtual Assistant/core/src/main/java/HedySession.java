@@ -9,10 +9,16 @@ public class HedySession {
         this.hedyAssistant = hedyAssistant;
         this.interactionHistory = new InteractionHistory(historyFilePath);
         this.isActive = true;
+
+        // Reiniciar el historial al inicio de la sesión
+        interactionHistory.clearHistory();
+        interactionHistory.addEvent("Sesión iniciada.");
     }
 
     public void start() {
+        interactionHistory.clearHistory(); // Clear the history at the start of the session
         interactionHistory.addEvent("Sesión iniciada.");
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Hedy está lista para responder tus preguntas. Escribe 'salir' para terminar la sesión.");
 
@@ -27,7 +33,7 @@ public class HedySession {
             } else {
                 String response = hedyAssistant.processInput(userInput);
                 System.out.println("Hedy: " + response);
-                interactionHistory.addInteraction(userInput, response); // Registrar interacción
+                interactionHistory.addInteraction(userInput, response); // Register the interaction
             }
         }
 

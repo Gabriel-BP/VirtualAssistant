@@ -5,24 +5,30 @@ public class HedyAssistant {
     private final InteractionHistory interactionHistory;
 
     public HedyAssistant(String configFilePath, String historyFilePath) {
-        // Inicializar ConfigManager con el archivo de configuración
         ConfigManager configManager = new ConfigManager(configFilePath);
         configManager.loadConfig();
 
-        // Inicializar KeywordMatcher y QwenAssistant
         KeywordMatcher keywordMatcher = new KeywordMatcher();
-        QwenAssistant qwenAssistant = new QwenAssistant(); // Cambio aquí: Usar QwenAssistant
+        QwenAssistant qwenAssistant = new QwenAssistant();
         this.responseProcessor = new ResponseProcessor(keywordMatcher, qwenAssistant);
 
-        // Inicializar InteractionHistory con la ruta del archivo
         this.interactionHistory = new InteractionHistory(historyFilePath);
     }
 
     public String processInput(String input) {
-        // Procesar la respuesta del asistente
-        String response = responseProcessor.processResponse(input);
+        // Get the current session's history
+        List<String> history = getInteractionHistory();
 
-        // Agregar interacción al historial
+        // Convert the history to a string format (e.g., JSON or plain text)
+        StringBuilder historyString = new StringBuilder();
+        for (String entry : history) {
+            historyString.append(entry).append("\n");
+        }
+
+        // Process the response using the input and history
+        String response = responseProcessor.processResponse(input, historyString.toString());
+
+        // Add the interaction to the current session's history
         interactionHistory.addInteraction(input, response);
 
         return response;
@@ -34,5 +40,13 @@ public class HedyAssistant {
 
     public void clearHistory() {
         interactionHistory.clearHistory(); // Limpia el historial
+    }
+
+    private String getHistoryContent() {
+        StringBuilder historyBuilder = new StringBuilder();
+        for (String entry : interactionHistory.getAllInteractions()) {
+            historyBuilder.append(entry).append("\n");
+        }
+        return historyBuilder.toString();
     }
 }
