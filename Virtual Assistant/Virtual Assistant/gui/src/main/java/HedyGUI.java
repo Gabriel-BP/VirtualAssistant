@@ -106,13 +106,26 @@ import java.util.Properties;
                     ConfigManager configManager = new ConfigManager(configFilePath);
                     configManager.loadConfig();
                     try {
+                        // Verificar si el asistente está iniciado
+                        if (assistant == null) {
+                            assistant = new HedyAssistant(configFilePath, historyFilePath);
+                            assistantRunning = true;
+                            userInputField.setEnabled(true);
+                            sendButton.setEnabled(true);
+                            appendMessage("Hedy", "Asistente iniciado automáticamente para control por voz.");
+                        }
+
                         String accessKey = ConfigManager.getConfig("picovoice_api_key");
                         String modelPath = ConfigManager.getConfig("picovoice_model_path");
                         String[] keywordPaths = {ConfigManager.getConfig("picovoice_keywords_path")};
                         float[] sensitivities = {0.5f};
                         int audioDeviceIndex = -1;
-                        // Pasar la referencia de HedyGUI como GUICallback
-                        WakeWordDetector detector = new WakeWordDetector(accessKey, modelPath, keywordPaths, sensitivities, audioDeviceIndex, HedyGUI.this);
+
+                        // Pasar la referencia de HedyGUI como GUICallback y el asistente
+                        WakeWordDetector detector = new WakeWordDetector(
+                                accessKey, modelPath, keywordPaths, sensitivities,
+                                audioDeviceIndex, HedyGUI.this, assistant);
+
                         appendMessage("Hedy", "Control por voz iniciado. Escuchando...");
                         detector.startListening();
                     } catch (Exception ex) {
