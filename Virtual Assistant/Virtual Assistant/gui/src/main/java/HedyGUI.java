@@ -25,13 +25,25 @@ public class HedyGUI implements GUICallback {
     String visualPath = "Virtual Assistant/utils/visuals";
 
     public HedyGUI() {
+        // Inicializa chatArea antes de cargar las preferencias
+        chatArea = new JTextArea();
+        chatArea.setEditable(false);
+        chatArea.setLineWrap(true);
+        chatArea.setWrapStyleWord(true);
+        chatArea.setFont(new Font("Monospaced", Font.PLAIN, 22));
+        chatArea.setBackground(new Color(40, 40, 40));
+        chatArea.setForeground(Color.WHITE);
+
+        // Carga las preferencias después de inicializar chatArea
         loadPreferences();
+
         String themePreference = appPreferences.getProperty("theme", "dark");
         if ("dark".equalsIgnoreCase(themePreference)) {
             FlatDarkLaf.setup();
         } else {
             FlatLightLaf.setup();
         }
+
         interactionHistory = new InteractionHistory(historyFilePath);
 
         JFrame frame = new JFrame("Hedy Assistant");
@@ -132,22 +144,40 @@ public class HedyGUI implements GUICallback {
         });
         addButton(buttonPanel, editConfigButton);
 
-        // Settings Button for Theme Selection
+        // Settings Button for Theme Selection and Font Size
         JButton settingsButton = createStyledButton("⚙️ Settings");
         settingsButton.addActionListener(e -> {
             JDialog settingsDialog = new JDialog(frame, "Settings", true);
-            settingsDialog.setLayout(new GridLayout(2, 1));
+            settingsDialog.setLayout(new GridLayout(3, 2)); // Adjust layout for font size
+
+            // Theme Selection
             JLabel themeLabel = new JLabel("Select Theme:");
             JComboBox<String> themeDropdown = new JComboBox<>(new String[]{"Dark", "Light"});
             themeDropdown.setSelectedItem(appPreferences.getProperty("theme", "dark").equalsIgnoreCase("dark") ? "Dark" : "Light");
-            themeDropdown.addActionListener(e1 -> {
+            themeDropdown.addActionListener(event -> {
                 String selectedTheme = (String) themeDropdown.getSelectedItem();
                 setTheme(selectedTheme, frame);
-                settingsDialog.dispose();
+                settingsDialog.dispose(); // Close dialog after applying changes
             });
+
+            // Font Size Selection
+            JLabel fontSizeLabel = new JLabel("Select Font Size:");
+            JComboBox<String> fontSizeDropdown = new JComboBox<>(new String[]{"12", "14", "16", "18", "20", "22"});
+            fontSizeDropdown.setSelectedItem(appPreferences.getProperty("fontSize", "12")); // Default font size
+            fontSizeDropdown.addActionListener(event -> {
+                String selectedFontSize = (String) fontSizeDropdown.getSelectedItem();
+                appPreferences.setProperty("fontSize", selectedFontSize);
+                savePreferences();
+                updateFontSize(Integer.parseInt(selectedFontSize), chatArea); // Update font size immediately
+                settingsDialog.dispose(); // Close dialog after applying changes
+            });
+
             settingsDialog.add(themeLabel);
             settingsDialog.add(themeDropdown);
-            settingsDialog.setSize(200, 100);
+            settingsDialog.add(fontSizeLabel);
+            settingsDialog.add(fontSizeDropdown);
+
+            settingsDialog.setSize(300, 200);
             settingsDialog.setLocationRelativeTo(frame);
             settingsDialog.setVisible(true);
         });
@@ -183,6 +213,11 @@ public class HedyGUI implements GUICallback {
         sendButton.addActionListener(e -> sendMessage());
 
         frame.setVisible(true);
+    }
+
+    private void updateFontSize(int fontSize, JTextArea textArea) {
+        Font currentFont = textArea.getFont();
+        textArea.setFont(new Font(currentFont.getName(), currentFont.getStyle(), fontSize));
     }
 
     // 5. Modificar metodo addButton para aceptar JButton
@@ -297,7 +332,11 @@ public class HedyGUI implements GUICallback {
             appPreferences.setProperty("windowY", "100");
             appPreferences.setProperty("windowWidth", "1100");
             appPreferences.setProperty("windowHeight", "800");
+            appPreferences.setProperty("fontSize", "12"); // Default font size
         }
+
+        int fontSize = Integer.parseInt(appPreferences.getProperty("fontSize", "12"));
+        updateFontSize(fontSize, chatArea); // Apply the loaded font size
     }
 
     private void saveWindowPreferences(JFrame frame) {

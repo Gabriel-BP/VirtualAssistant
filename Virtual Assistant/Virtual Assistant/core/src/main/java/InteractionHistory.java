@@ -12,7 +12,6 @@ public class InteractionHistory {
     public InteractionHistory(String historyFilePath) {
         this.historyFilePath = historyFilePath;
         this.history = new ArrayList<>();
-        loadHistory(); // Load existing history at initialization
     }
 
     public void addEvent(String event) {
@@ -44,8 +43,13 @@ public class InteractionHistory {
     }
 
     public void clearHistory() {
-        history.clear(); // Clear the in-memory list
-        saveHistory();   // Save the empty history to the file
+        history.clear(); // Limpia la lista interna
+
+        try (FileWriter writer = new FileWriter(historyFilePath, false)) {
+            // Sobrescribe el archivo para eliminar todas las entradas antiguas
+        } catch (IOException e) {
+            System.err.println("Error al limpiar el historial: " + e.getMessage());
+        }
     }
 
     private void saveHistory() {
