@@ -33,7 +33,8 @@ public class InputModule {
         this.credentials = GoogleCredentials.fromStream(new FileInputStream(credentialsPath));
     }
 
-    public String transcribeFromMicrophone() {
+    // Metodo modificado para aceptar una línea de micrófono existente
+    public String transcribeFromMicrophone(TargetDataLine existingMicrophone) {
         // Create completion latch to wait for the transcription to complete
         CountDownLatch completionLatch = new CountDownLatch(1);
 
@@ -109,20 +110,15 @@ public class InputModule {
                     .build();
             clientStream.send(configRequest);
 
-            // Start audio capture
-            AudioFormat audioFormat = new AudioFormat(SAMPLE_RATE, 16, CHANNELS, true, false);
-            DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
+            // Utilizamos el micrófono existente en lugar de abrir uno nuevo
+            TargetDataLine microphone = existingMicrophone;
 
-            if (!AudioSystem.isLineSupported(targetInfo)) {
-                System.err.println("Microphone not supported");
+            // El micrófono ya debería estar abierto, así que solo verificamos
+            if (!microphone.isOpen()) {
+                System.err.println("Microphone not open");
                 speechClient.close();
                 return "";
             }
-
-            // Set up the microphone
-            TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(targetInfo);
-            microphone.open(audioFormat);
-            microphone.start();
 
             System.out.println("Escuchando...");
 
@@ -154,8 +150,8 @@ public class InputModule {
                 }
             }
 
-            // Close the microphone and the stream
-            microphone.close();
+            // No cerramos el micrófono, ya que será utilizado por WakeWordDetector
+            // microphone.close();
             clientStream.closeSend();
 
             // Wait for the transcription to complete
@@ -176,6 +172,37 @@ public class InputModule {
         return finalTranscript.toString();
     }
 
+    // Metodo original para retrocompatibilidad
+    public String transcribeFromMicrophone() {
+        try {
+            // Configure el formato de audio igual que WakeWordDetector
+            AudioFormat audioFormat = new AudioFormat(SAMPLE_RATE, 16, CHANNELS, true, false);
+            DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
+
+            if (!AudioSystem.isLineSupported(targetInfo)) {
+                System.err.println("Microphone not supported");
+                return "";
+            }
+
+            // Set up the microphone
+            TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(targetInfo);
+            microphone.open(audioFormat);
+            microphone.start();
+
+            // Use the new method with the created microphone
+            String result = transcribeFromMicrophone(microphone);
+
+            // Close the microphone when done
+            microphone.close();
+
+            return result;
+        } catch (Exception e) {
+            System.err.println("Exception setting up microphone: " + e.getMessage());
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     // Helper method to detect sound level
     private boolean isSoundDetected(byte[] audioData, int bytesRead) {
         // Calculate the sound level
@@ -189,8 +216,8 @@ public class InputModule {
         return amplitude > SILENCE_THRESHOLD;
     }
 
-    // Example usage
-    public static void main(String[] args) {
+    // Example usage actualizado
+    public static void Transcribe() {
         try {
             InputModule inputModule = new InputModule("Virtual Assistant/utils/credentials.json");
             String transcript = inputModule.transcribeFromMicrophone();
@@ -199,5 +226,21 @@ public class InputModule {
             System.err.println("Error initializing InputModule: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    // Nuevo metodo para ser llamado desde WakeWordDetector
+    public static void Transcribe(TargetDataLine microphone) {
+        try {
+            InputModule inputModule = new InputModule("Virtual Assistant/utils/credentials.json");
+            String transcript = inputModule.transcribeFromMicrophone(microphone);
+            System.out.println("Final transcript: " + transcript);
+        } catch (IOException e) {
+            System.err.println("Error initializing InputModule: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        Transcribe();
     }
 }

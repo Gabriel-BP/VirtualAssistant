@@ -9,7 +9,7 @@ import java.util.Properties;
 
 
 @SuppressWarnings("ALL")
-public class HedyGUI implements GUICallback {
+    public class HedyGUI implements GUICallback {
     private boolean assistantRunning = false;
     private JTextArea chatArea;
     private JTextField userInputField;

@@ -1,5 +1,4 @@
 import ai.picovoice.porcupine.Porcupine;
-
 import javax.sound.sampled.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,7 +46,14 @@ public class WakeWordDetector {
                     int result = porcupine.process(porcupineBuffer);
                     if (result >= 0) {
                         guiCallback.appendMessage("Hedy", "Palabra clave detectada!");
-                        break; // Notify GUI or start transcription
+                        // Pausa la detección de palabras clave temporalmente
+                        micDataLine.stop();
+
+                        // Llama al metodo actualizado para transcribir usando el mismo micrófono
+                        InputModule.Transcribe(micDataLine);
+
+                        // Reinicia la detección de palabras clave
+                        micDataLine.start();
                     }
                 }
             }
