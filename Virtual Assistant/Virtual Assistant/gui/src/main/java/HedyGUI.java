@@ -19,6 +19,7 @@ import java.util.Properties;
     private Properties appPreferences;
     private JComboBox appearanceModeDropdown;
     private JLabel logoLabel;
+    private OutputModule ttsClient; // Variable para el cliente TTS
     private JButton startAssistantButton; // 1. Declarar el botón como variable de clase
     String configFilePath = "Virtual Assistant/utils/config.json";
     String historyFilePath = "Virtual Assistant/utils/history.log";
@@ -279,9 +280,27 @@ import java.util.Properties;
                 assistant = new HedyAssistant(configFilePath, historyFilePath);
                 assistant.clearHistory(); // Clear the history when starting a new session
             }
+
+            // Initialize TTS client if not already initialized
+            if (ttsClient == null) {
+                try {
+                    ttsClient = OutputModule.getInstance("Virtual Assistant/utils/credentials.json");
+                    appendMessage("Hedy", "Cliente TTS iniciado.");
+                } catch (IOException e) {
+                    appendMessage("Hedy", "Error al iniciar el cliente TTS.");
+                    e.printStackTrace();
+                }
+            }
+
             appendMessage("Hedy", "Asistente iniciado.");
         } else {
             appendMessage("Hedy", "Asistente detenido.");
+
+            // Shutdown TTS client when stopping the assistant
+            if (ttsClient != null) {
+                ttsClient.shutdown();
+                ttsClient = null;
+            }
         }
     }
 
@@ -290,12 +309,16 @@ import java.util.Properties;
         if (!input.isEmpty()) {
             appendMessage("Usuario", input);
             userInputField.setText("");
-
             new Thread(() -> {
                 try {
                     String response = assistant.processInput(input);
                     SwingUtilities.invokeLater(() -> appendMessage("Hedy", response));
                     interactionHistory.addInteraction(input, response); // Add interaction to history
+
+                    // Speak the response using TTS
+                    if (ttsClient != null) {
+                        ttsClient.speak(response, false); // Play asynchronously
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     SwingUtilities.invokeLater(() -> appendMessage("Hedy", "Lo siento, ha ocurrido un error al procesar tu solicitud."));
