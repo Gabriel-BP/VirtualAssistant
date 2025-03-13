@@ -1,4 +1,3 @@
-// OutputModule.java - Módulo para la generación de audio mediante Google Cloud TTS
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.texttospeech.v1.*;
@@ -178,6 +177,20 @@ public class OutputModule {
     public void close() {
         if (textToSpeechClient != null) {
             textToSpeechClient.close();
+        }
+    }
+
+    /**
+     * Example usage
+     */
+    public static void main(String[] args) {
+        try {
+            OutputModule outputModule = new OutputModule("Virtual Assistant/utils/credentials.json");
+            outputModule.speak("Hola, soy Hedy, tu asistente virtual. ¿En qué puedo ayudarte hoy?");
+            outputModule.close();
+        } catch (IOException e) {
+            System.err.println("Error initializing OutputModule: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
