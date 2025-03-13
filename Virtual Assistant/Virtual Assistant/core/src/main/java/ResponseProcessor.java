@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class ResponseProcessor {
     private final KeywordMatcher keywordMatcher;
     private final QwenAssistant qwenAssistant;
@@ -7,7 +9,7 @@ public class ResponseProcessor {
         this.qwenAssistant = qwenAssistant;
     }
 
-    public String processResponse(String input, String history) {
+    public String processResponse(String input, String history) throws IOException {
         // Check for keyword matches first
         String keywordResponse = keywordMatcher.matchKeyword(input);
         if (keywordResponse != null && !keywordResponse.isEmpty()) {

@@ -1,10 +1,11 @@
+import java.io.IOException;
 import java.util.List;
 
 public class HedyAssistant {
     private final ResponseProcessor responseProcessor;
     private final InteractionHistory interactionHistory;
 
-    public HedyAssistant(String configFilePath, String historyFilePath) {
+    public HedyAssistant(String configFilePath, String historyFilePath) throws IOException {
         ConfigManager configManager = new ConfigManager(configFilePath);
         configManager.loadConfig();
 
@@ -15,7 +16,7 @@ public class HedyAssistant {
         this.interactionHistory = new InteractionHistory(historyFilePath);
     }
 
-    public String processInput(String input) {
+    public String processInput(String input) throws IOException {
         // Get the current session's history
         List<String> history = getInteractionHistory();
 

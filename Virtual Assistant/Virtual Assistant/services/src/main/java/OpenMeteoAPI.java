@@ -14,7 +14,7 @@ public class OpenMeteoAPI {
 
     // Coordenadas predeterminadas para Las Palmas de Gran Canaria
     private static final double DEFAULT_LATITUDE = 28.0997;
-    private static final double DEFAULT_LONGITUDE = 15.4134;
+    private static final double DEFAULT_LONGITUDE = -15.4134;
 
     public OpenMeteoAPI(double latitude, double longitude) throws IOException {
         this.latitude = latitude;

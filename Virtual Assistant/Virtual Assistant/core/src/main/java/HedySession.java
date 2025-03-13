@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class HedySession {
@@ -15,7 +16,7 @@ public class HedySession {
         interactionHistory.addEvent("Sesión iniciada.");
     }
 
-    public void start() {
+    public void start() throws IOException {
         interactionHistory.clearHistory(); // Clear the history at the start of the session
         interactionHistory.addEvent("Sesión iniciada.");
 

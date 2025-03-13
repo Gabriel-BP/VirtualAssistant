@@ -222,7 +222,13 @@ import java.util.Properties;
         inputPanel.add(sendButton, BorderLayout.EAST);
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
 
-        startAssistantButton.addActionListener(e -> toggleAssistant());
+        startAssistantButton.addActionListener(e -> {
+            try {
+                toggleAssistant();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         sendButton.addActionListener(e -> sendMessage());
 
         frame.setVisible(true);
@@ -263,7 +269,7 @@ import java.util.Properties;
         panel.add(button, gbc);
     }
 
-    private void toggleAssistant() {
+    private void toggleAssistant() throws IOException {
         assistantRunning = !assistantRunning;
         userInputField.setEnabled(assistantRunning);
         sendButton.setEnabled(assistantRunning);

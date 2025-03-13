@@ -43,7 +43,6 @@
             <groupId>ai.picovoice</groupId>
             <artifactId>porcupine-java</artifactId>
             <version>3.0.4</version>
-            <scope>runtime</scope>
         </dependency>
 
         <dependency>

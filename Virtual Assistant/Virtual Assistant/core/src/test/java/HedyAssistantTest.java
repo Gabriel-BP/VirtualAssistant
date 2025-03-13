@@ -1,5 +1,7 @@
+import java.io.IOException;
+
 public class HedyAssistantTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String configFilePath = "utils/config.json";
         String historyFilePath = "utils/history.log"; // Archivo para historial
 
