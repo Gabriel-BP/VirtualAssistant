@@ -8,7 +8,7 @@ public class QwenAssistantTest {
         try {
             String response = assistant.generateResponse("Dime un dato curioso", history);
             long endTime = System.nanoTime(); // Detener el cronómetro
-
+            OutputModule.ttsSpeech(response);
             double elapsedTimeInSeconds = (endTime - startTime) / 1.0e9; // Convertir nanosegundos a segundos
 
             System.out.println("Respuesta: " + response);

@@ -10,7 +10,7 @@ import org.json.simple.parser.JSONParser;
 @SuppressWarnings("ALL")
 public class QwenAssistant {
     private static final String OLLAMA_API_URL = "http://localhost:11434/api/chat";  // Cambiado a endpoint chat
-    private static final String MODEL_NAME = "qwen2.5:14b";
+    private static final String MODEL_NAME = "qwen2.5:7b";
     private static final String SYSTEM_PROMPT =
             "Eres un asistente virtual llamado Hedy que fue desarrollada por el Museo Elder de la Ciencia y la Tecnología. Intentas mantener las respuestas lo más breve que puedas, pero sin perder tu naturalidad. ";
 
