@@ -28,7 +28,7 @@ public class QwenAssistant {
     public String generateResponse(String prompt, String history) throws Exception {
         StringBuilder responseBuilder = new StringBuilder();
 
-        // Llamar al método de streaming y recopilar la respuesta completa
+        // Llamar al metodo de streaming y recopilar la respuesta completa
         generateResponseStream(prompt, history, chunk -> {
             responseBuilder.append(chunk);
         });
