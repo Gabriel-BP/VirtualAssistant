@@ -9,7 +9,7 @@ public class ResponseProcessor {
         this.qwenAssistant = qwenAssistant;
     }
 
-    public String processResponse(String input, String history) throws IOException {
+    public String processResponse(String input, String history) throws Exception {
         // Check for keyword matches first
         String keywordResponse = keywordMatcher.matchKeyword(input);
         if (keywordResponse != null && !keywordResponse.isEmpty()) {

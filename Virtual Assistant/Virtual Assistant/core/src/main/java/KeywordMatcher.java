@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class KeywordMatcher {
-    public String matchKeyword(String input) throws IOException {
+    public String matchKeyword(String input) throws Exception {
         input = input.toLowerCase(); // Convertir a minúsculas para facilitar la comparación
 
         String intention = OpenNLPAnalyzer.analize(input);
@@ -23,12 +23,19 @@ public class KeywordMatcher {
             return decir_fecha();
         }
 
+        if (intention.equals("consultar_clima")) {
+            return consultarClimaDefault();
+        }
+
+        if (intention.equals("consultar_clima_lugar")) {
+            return consultarClimaLugar("Paris"); // Cambiar por la real usando GOOGLE NLP
+        }
         if (intention.equals("consultar_cartelera")) {
-            return consultarCartelera(List.of("release_date", "overview", "vote_average"));
+            return consultarCartelera(List.of(), false); // Solo nombres por ahora
         }
 
         if (intention.equals("consultar_estrenos")) {
-            return consultarUpcomingCartelera(List.of("release_date", "overview"));
+            return consultarUpcomingCartelera(List.of(), false); // Solo nombres por ahora
         }
 
         // Si no coincide con ninguna palabra clave, retorna null
@@ -37,77 +44,78 @@ public class KeywordMatcher {
 
     // Función para obtener la hora actual en el formato "Son las 8 y 40"
     public static String decir_hora() {
-        // Obtener la hora actual del sistema
         LocalDateTime ahora = LocalDateTime.now();
-
-        // Extraer la hora y los minutos
         int hora = ahora.getHour();
         int minutos = ahora.getMinute();
-
-        // Construir el mensaje
         return String.format("Son las %d y %d", hora, minutos);
     }
 
     // Función para obtener la fecha actual en el formato "Hoy es viernes 14 de marzo de 2025"
     public static String decir_fecha() {
-        // Obtener la fecha actual del sistema
         LocalDateTime ahora = LocalDateTime.now();
-
-        // Formatear el día de la semana (por ejemplo, "viernes")
         String diaSemana = ahora.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.of("es", "ES"));
-
-        // Formatear el día del mes (por ejemplo, "14")
         int diaMes = ahora.getDayOfMonth();
-
-        // Formatear el nombre del mes (por ejemplo, "marzo")
         String mes = ahora.getMonth().getDisplayName(TextStyle.FULL, Locale.of("es", "ES"));
-
-        // Formatear el año (por ejemplo, "2025")
         int anio = ahora.getYear();
-
-        // Construir el mensaje
         return String.format("Hoy es %s %d de %s de %d", diaSemana, diaMes, mes, anio);
     }
 
-    public static String consultarCartelera(List<String> campos) throws IOException {
+    // Función para obtener el clima
+    public static String consultarClimaDefault() throws Exception {
+        OpenMeteoAPI apiDefault = new OpenMeteoAPI();
+        return apiDefault.fetchWeatherData(0);
+    }
+
+    // Función para obtener el clima en un lugar
+    public static String consultarClimaLugar(String lugar) throws Exception {
+        LocationCoordinates coordinates = NominatimGeocodingService.getCoordinates(lugar);
+        OpenMeteoAPI apiLugar = new OpenMeteoAPI(coordinates.getLatitude(), coordinates.getLongitude());
+        return apiLugar.fetchWeatherData(1);
+    }
+
+    public static String consultarCartelera(List<String> campos, boolean incluirDetalles) throws IOException {
         StringBuilder resultado = new StringBuilder("Las películas en cartelera son:\n");
         String jsonStr = new String(Files.readAllBytes(Paths.get("Virtual Assistant/utils/current_movies_formatted.json")));
         JSONObject cartelera = new JSONObject(jsonStr);
 
         for (String pelicula : cartelera.keySet()) {
-            JSONObject detalles = cartelera.getJSONObject(pelicula);
-            resultado.append("Película: ").append(pelicula).append("\n");
+            resultado.append("- ").append(pelicula).append("\n");
 
-            for (String campo : campos) {
-                if (detalles.has(campo)) {
-                    resultado.append("  ").append(campo).append(": ").append(detalles.get(campo)).append("\n");
-                } else {
-                    resultado.append("  ").append(campo).append(": No disponible\n");
+            if (incluirDetalles) {
+                JSONObject detalles = cartelera.getJSONObject(pelicula);
+                for (String campo : campos) {
+                    if (detalles.has(campo)) {
+                        resultado.append("  ").append(campo).append(": ").append(detalles.get(campo)).append("\n");
+                    } else {
+                        resultado.append("  ").append(campo).append(": No disponible\n");
+                    }
                 }
+                resultado.append("\n"); // Salto de línea entre películas
             }
-            resultado.append("\n"); // Salto de línea entre películas
         }
 
         return resultado.toString();
     }
 
-    public static String consultarUpcomingCartelera(List<String> campos) throws IOException {
+    public static String consultarUpcomingCartelera(List<String> campos, boolean incluirDetalles) throws IOException {
         StringBuilder resultado = new StringBuilder("Los próximos estrenos son:\n");
         String jsonStr = new String(Files.readAllBytes(Paths.get("Virtual Assistant/utils/upcoming_movies_formatted.json")));
         JSONObject upcoming = new JSONObject(jsonStr);
 
         for (String pelicula : upcoming.keySet()) {
-            JSONObject detalles = upcoming.getJSONObject(pelicula);
-            resultado.append("Película: ").append(pelicula).append("\n");
+            resultado.append("- ").append(pelicula).append("\n");
 
-            for (String campo : campos) {
-                if (detalles.has(campo)) {
-                    resultado.append("  ").append(campo).append(": ").append(detalles.get(campo)).append("\n");
-                } else {
-                    resultado.append("  ").append(campo).append(": No disponible\n");
+            if (incluirDetalles) {
+                JSONObject detalles = upcoming.getJSONObject(pelicula);
+                for (String campo : campos) {
+                    if (detalles.has(campo)) {
+                        resultado.append("  ").append(campo).append(": ").append(detalles.get(campo)).append("\n");
+                    } else {
+                        resultado.append("  ").append(campo).append(": No disponible\n");
+                    }
                 }
+                resultado.append("\n"); // Salto de línea entre películas
             }
-            resultado.append("\n"); // Salto de línea entre películas
         }
 
         return resultado.toString();
@@ -130,10 +138,13 @@ public class KeywordMatcher {
         OpenMeteoAPI apiLugar = new OpenMeteoAPI(coordinates.getLatitude(), coordinates.getLongitude());
         System.out.println(apiLugar.fetchWeatherData(1));
 
-        // Consultar cartelera
-        System.out.println(consultarCartelera(List.of("release_date", "overview", "vote_average")));
+        // Consultar cartelera (solo nombres)
+        System.out.println(consultarCartelera(List.of(), false));
 
-        // Consultar upcoming cartelera
-        System.out.println(consultarUpcomingCartelera(List.of("release_date", "overview")));
+        // Consultar upcoming cartelera (solo nombres)
+        System.out.println(consultarUpcomingCartelera(List.of(), false));
+
+        // Ejemplo: Consultar cartelera con detalles (para futuras pruebas)
+        // System.out.println(consultarCartelera(List.of("release_date", "overview", "vote_average"), true));
     }
 }

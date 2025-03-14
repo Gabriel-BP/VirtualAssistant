@@ -16,7 +16,7 @@ public class HedyAssistant {
         this.interactionHistory = new InteractionHistory(historyFilePath);
     }
 
-    public String processInput(String input) throws IOException {
+    public String processInput(String input) throws Exception {
         // Get the current session's history
         List<String> history = getInteractionHistory();
 

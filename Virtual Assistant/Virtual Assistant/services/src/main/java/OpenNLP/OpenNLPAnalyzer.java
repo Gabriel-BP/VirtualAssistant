@@ -31,7 +31,7 @@ public class OpenNLPAnalyzer {
     }
 
     public static void main(String[] args) throws IOException {
-        String category = analize("Qué hora es");
+        String category = analize("Qué tiempo hace");
         System.out.println(category);
     }
 }

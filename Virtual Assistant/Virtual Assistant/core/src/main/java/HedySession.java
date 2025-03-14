@@ -16,7 +16,7 @@ public class HedySession {
         interactionHistory.addEvent("Sesión iniciada.");
     }
 
-    public void start() throws IOException {
+    public void start() throws Exception {
         interactionHistory.clearHistory(); // Clear the history at the start of the session
         interactionHistory.addEvent("Sesión iniciada.");
 
