@@ -98,8 +98,10 @@ public class TMDBService {
 
             // Obtener y almacenar respuestas JSON
             JSONObject en_cartelera = new JSONObject(tmdb.getNowPlayingMovies());
+            System.out.println(en_cartelera.toString());
             // Formatear los datos según el formato requerido
             JSONObject formattedCurrentlyJson = TMDBFormatter.formatMovieData(en_cartelera);
+            System.out.println(formattedCurrentlyJson.toString());
 
             try (FileWriter file = new FileWriter("Virtual Assistant/utils/current_movies_formatted.json")) {
                 file.write(formattedCurrentlyJson.toString(2));

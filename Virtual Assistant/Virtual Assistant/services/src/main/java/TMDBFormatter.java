@@ -1,6 +1,7 @@
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
 public class TMDBFormatter {
 
     /**
@@ -56,6 +57,11 @@ public class TMDBFormatter {
                     if (movie.has("name")) {
                         String name = movie.getString("name");
                         formattedJson.put(name, movieDetails);
+                    }
+
+                    if (movie.has("title")) {
+                        String title = movie.getString("title");
+                        formattedJson.put(title, movieDetails);
                     }
                 }
             }

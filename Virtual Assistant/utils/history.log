@@ -1,4 +1,83 @@
-User: Hola!
-Hedy: ¡Hola! ¿En qué puedo ayudarte hoy?
-User: Cual es la capital de España?
-Hedy: Madrid.
+User: Que estrenos hay proximamente?
+Hedy: Los próximos estrenos son:
+Película: Sugar Island
+  release_date: 2025-03-21
+  overview: La mecanización de la industria azucarera amenaza con desplazar a los trabajadores. Makenya, una adolescente embarazada, acompaña a su abuelo cañero en las protestas para ser indemnizados. El proceso de gestación es el viaje hacia la adultez, mientras su cuerpo se ensancha ocurre la última zafra manual, termina la cosecha y el llanto de la criatura presagia un nuevo mundo.
+
+Película: Un hombre libre
+  release_date: 2025-03-28
+  overview: Este largometraje nos sumerge en la vida de Agustín Gómez Arcos, un autor que alcanzó el éxito en la escena literaria francesa en los años 70, mientras que en España su nombre permanecía en la sombra.
+
+Película: Tierra de nadie
+  release_date: 2025-03-28
+  overview: Esta es la historia de tres amigos. Mateo el Gallego, un heroico -a su pesar- guardia civil, Juan El Antxale, un pescador convertido en narco por la mala suerte y en el paro, y Benito el Yeye, un resignado e inteligente depositario judicial siempre a medio camino entre la ley y la delincuencia. Tres amigos separados por un lugar, Cádiz y un momento, el presente. Atrapados los tres entre el abandono de las instituciones, el violento e imparable ascenso del narco en la provincia y el peligroso aumento del descontento social. Tres amigos atrapados en un polvorín que pondrá a prueba su amistad.
+
+Película: Un año y un día
+  release_date: 2025-03-21
+  overview: Un hombre está decidido a recuperar al amor de su vida aprendiendo a tocar el piano durante un año. Su vecina le dará clases para conseguirlo.
+
+Película: Lady Sakura
+  release_date: 2025-03-28
+  overview: Drama tiene 26 años, es fotógrafa, y encadena trabajos y relaciones esporádicas mientras espera una beca con la que abrir una pequeña galería ahora que Clara, su mejor amiga y compañera de piso, se muda a otra ciudad
+
+Película: The Alto Knights
+  release_date: 2025-03-21
+  overview: Vito Genovese y Frank Costello, un par de italoamericanos que dirigen dos familias criminales separadas a mediados del siglo XX. Genovese intentó asesinar a Costello en 1957, aunque Costello se retiró de la mafia.
+
+Película: Los aitas
+  release_date: 2025-03-21
+  overview: En la periferia obrera del Bilbao de finales de los 80, un equipo infantil de gimnasia rítmica tiene la oportunidad de participar en un campeonato en Berlín. Ante la imposibilidad de que las madres acompañen a sus hijas, la tarea recaerá en los padres, que no parecen muy interesados en el viaje, ni en ese deporte, ni incluso en sus propias hijas.
+
+Película: Novocaine
+  release_date: 2025-03-21
+  overview: Cuando la chica de sus sueños es secuestrada, Nate, un chico corriente, convierte su incapacidad para sentir dolor en una fuerza inesperada en su lucha por recuperarla.
+
+Película: Blancanieves
+  release_date: 2025-03-21
+  overview: Remake a live action del clásico animado de Disney de 1937.
+
+Película: La chica de la aguja
+  release_date: 2025-03-21
+  overview: Una joven embarazada que acaba de quedarse sin trabajo en Copenhague lucha por sobrevivir y es acogida por un anciano carismático para que la ayude a dirigir una agencia de adopción clandestina. Entre los dos se crea un vínculo inesperado, hasta que un descubrimiento repentino lo cambia todo.
+
+Película: A Working Man
+  release_date: 2025-03-28
+  overview: Levon Cade dejó atrás una condecorada carrera militar en las operaciones encubiertas para vivir una vida sencilla trabajando en la construcción. Pero cuando la hija de su jefe, que para él es como de la familia, es secuestrada por traficantes de personas, su búsqueda para traerla a casa descubre un mundo de corrupción mucho mayor de lo que jamás podría haber imaginado.
+
+Película: Por todo lo alto
+  release_date: 2025-03-28
+  overview: 
+
+Película: Misericordia
+  release_date: 2025-03-21
+  overview: 
+
+Película: La furia
+  release_date: 2025-03-28
+  overview: Tras ser violada en fin de año, Alex busca refugio en su hermano Adrián. Pero él, consumido por la rabia, sigue un camino cada vez más oscuro. Su reacción los aleja y ella canaliza el dolor a través del teatro, interpretando al vengativo personaje de Medea.
+
+Película: Una película de Minecraft
+  release_date: 2025-04-04
+  overview: Largometraje basado en el popular videojuego "Minecraft".
+
+Película: 8
+  release_date: 2025-03-21
+  overview: Los 90 años de vida de Octavio y Adela ocurren en 8 capítulos, que son 8 momentos, 8 sinuosos planos en continuidad en 8 fechas decisivas de la historia de España, entre 1931 y 2021. Octavio y Adela nacen en dos pueblos vecinos de una sierra cercana a Madrid el mismo amanecer en que se proclama la II República. Así, desde el primer día, y sin ellos saberlo, sus destinos discurren conectados, enlazados en forma de “8”, dos bucles con un cruce en el centro, mientras de fondo transcurre España; la que le toca vivir a cada uno.
+
+Película: Sting. Araña asesina
+  release_date: 2025-03-28
+  overview: Pelicula inspirada en uno de los mayores temores de la humanidad, la aracnofobia, más monstruosa que nunca.
+
+Película: Guillermo Tell
+  release_date: 2025-04-04
+  overview: 
+
+Película: Una vida en secreto
+  release_date: 2025-04-04
+  overview: 
+
+Película: Diplodocus
+  release_date: 2025-03-28
+  overview: 
+
+

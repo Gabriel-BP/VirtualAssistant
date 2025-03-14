@@ -13,7 +13,7 @@ public class OpenMeteoTest {
             String locationName = "Paris"; // Example location in Spanish
             LocationCoordinates coordinates = NominatimGeocodingService.getCoordinates(locationName);
             OpenMeteoAPI apiParis = new OpenMeteoAPI(coordinates.getLatitude(), coordinates.getLongitude());
-            System.out.println(apiParis.fetchWeatherData(1, "48.8566", "2.3522"));
+            System.out.println(apiParis.fetchWeatherData(1));
 
             // ¿Cuál es la temperatura actual? (Usa coordenadas predeterminadas)
             System.out.println(apiDefault.fetchWeatherData(2, "temperature_2m"));

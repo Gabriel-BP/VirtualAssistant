@@ -17,7 +17,7 @@ public class OpenNLPTester {
             DoccatModel model = new DoccatModel(new FileInputStream(modelFile));
             DocumentCategorizerME categorizer = new DocumentCategorizerME(model);
 
-            String input = "prueba";
+            String input = "qué fecha es";
 
             // Procesar la entrada
             String[] tokens = input.split("\\s+");
