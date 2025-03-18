@@ -26,12 +26,14 @@ public class OpenNLPAnalyzer {
 
         // Mostrar resultados
         double confianza =  outcomes[categorizer.getIndex(bestCategory)] * 100;
-
+        if (confianza < 20) {
+            return null;
+        }
         return bestCategory;
     }
 
     public static void main(String[] args) throws IOException {
-        String category = analize("Qué tiempo hace");
+        String category = analize("Hola");
         System.out.println(category);
     }
 }

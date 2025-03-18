@@ -68,7 +68,7 @@ public class TMDBService {
         return sendRequest("/genre/tv/list?language=es");
     }
 
-    public static void main(String[] args) {
+    public static void main() {
         String configFilePath = "Virtual Assistant/utils/config.json";
         ConfigManager configManager = new ConfigManager(configFilePath);
         configManager.loadConfig();

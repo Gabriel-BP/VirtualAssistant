@@ -15,6 +15,10 @@ public class KeywordMatcher {
 
         String intention = OpenNLPAnalyzer.analize(input);
 
+        if (intention == null) {
+            return null;
+        }
+
         if (intention.equals("decir_hora")) {
             return decir_hora();
         }

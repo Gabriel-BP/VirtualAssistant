@@ -279,6 +279,8 @@ import java.util.Properties;
             if (assistant == null) {
                 assistant = new HedyAssistant(configFilePath, historyFilePath);
                 assistant.clearHistory(); // Clear the history when starting a new session
+                // Actualizar las peliculas
+                TMDBService.main();
             }
 
             // Initialize TTS client if not already initialized

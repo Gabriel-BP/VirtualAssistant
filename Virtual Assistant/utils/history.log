@@ -1,31 +1,8 @@
-User: Qué tiempo hace
-Hedy: Temperatura actual: 20.4°C, Soleado
-User: Que tiempo hace en París
-Hedy: Temperatura actual: 7.1°C, Nublado
-User: Qué hora es
-Hedy: Son las 11 y 42
-User: que día es
-Hedy: Hoy es viernes 14 de marzo de 2025
-User: que hay en el cine
-Hedy: Las películas en cartelera son:
-- Amenaza en el aire
-- María Callas
-- The Order (La hermandad silenciosa)
-- Última voluntad
-- Wolfgang (Extraordinario)
-- Un día de esos
-- Capitán América: Brave New World
-- A Complete Unknown
-- Bridget Jones: Loca por él
-- Un baño propio
-- Aún Estoy Aquí
-- Fuera de la ley
-- Morlaix
-- Lee Miller
-- Mickey 17
-- Presence
-- Tardes de soledad
-- The Monkey
-- Este amor sí que duele
-- Paddington: Aventura en la selva
-
+User: Que hora es
+Hedy: Son las 12 y 14
+User: Que dia es
+Hedy: Hoy es martes 18 de marzo de 2025
+User: Hola!
+Hedy: ¡Hola! ¿Cómo estás?
+User: Adios
+Hedy: ¡Hasta luego!
