@@ -1,8 +1,6 @@
-User: Que hora es
-Hedy: Son las 12 y 14
-User: Que dia es
-Hedy: Hoy es martes 18 de marzo de 2025
-User: Hola!
-Hedy: ¡Hola! ¿Cómo estás?
-User: Adios
-Hedy: ¡Hasta luego!
+User: Hola
+Hedy: ¡Hola! ¿En qué puedo ayudarte hoy?
+User: QUe tiempo hace
+Hedy: Temperatura actual: 22.3°C, Soleado
+User: Que tiempo hace en Paris
+Hedy: Temperatura actual: 14.9°C, Soleado
