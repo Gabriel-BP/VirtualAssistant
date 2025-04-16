@@ -62,4 +62,6 @@ public class InteractionHistory {
             System.err.println("Error saving history: " + e.getMessage());
         }
     }
+
+
 }

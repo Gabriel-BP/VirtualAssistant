@@ -24,4 +24,5 @@ public class ResponseProcessor {
             return "Lo siento, ocurrió un error al procesar tu solicitud.";
         }
     }
+
 }

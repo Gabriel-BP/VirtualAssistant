@@ -1,6 +1,4 @@
 User: Hola
-Hedy: ¡Hola! ¿En qué puedo ayudarte hoy?
-User: QUe tiempo hace
-Hedy: Temperatura actual: 22.3°C, Soleado
-User: Que tiempo hace en Paris
-Hedy: Temperatura actual: 14.9°C, Soleado
+Hedy: ¡Hello! ¿Cómo estás?
+User: Que hora es
+Hedy: Son las 9 y 43

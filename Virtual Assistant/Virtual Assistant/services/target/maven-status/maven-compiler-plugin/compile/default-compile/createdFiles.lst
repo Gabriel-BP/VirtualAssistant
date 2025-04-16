@@ -1,0 +1,10 @@
+OpenNLP\IntentDetectorTrainer$IntentStream.class
+TMDBFormatter.class
+GoogleNLPAnalyzer.class
+OpenMeteoAPI.class
+LocationCoordinates.class
+NominatimGeocodingService.class
+TMDBService.class
+OpenNLP\IntentDetectorTrainer.class
+ConfigManager.class
+OpenNLP\OpenNLPAnalyzer.class
